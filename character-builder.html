@@ -1,0 +1,1890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stargate RPG Character Builder - Enhanced</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .transition-all { transition: all 0.3s ease; }
+        .rotate-180 { transform: rotate(180deg); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(147, 51, 234, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(147, 51, 234, 0.7); }
+        .icon { display: inline-block; width: 1em; height: 1em; vertical-align: middle; fill: currentColor; }
+        .icon-sm { width: 0.75rem; height: 0.75rem; }
+        .icon-md { width: 1rem; height: 1rem; }
+        .icon-lg { width: 1.25rem; height: 1.25rem; }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 p-4">
+    <div id="app"></div>
+    <script>
+        // Icons library
+        const icons = {
+            chevronDown: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>',
+            user: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+            shield: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>',
+            heart: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
+            zap: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+            brain: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.44-5A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.44-5A2.5 2.5 0 0 0 14.5 2Z"/></svg>',
+            target: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+            activity: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
+            download: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>',
+            alertCircle: '<svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>',
+            sparkles: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>',
+            award: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>',
+            bookOpen: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+            refresh: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>',
+            lock: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+            warning: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>'
+        };
+
+        // GAME DATA PLACEHOLDER - REPLACE THIS WITH ACTUAL DATA
+const gameData = {
+            // Field Hack feats with requirements - ALL require Survivalist ability (Scout class)
+            fieldHackFeats:[
+                {name:'Camouflage',requirements:'Stealth',baseRequirement:'Survivalist',description:'Using elements of the natural environment, you grant your team advantage on Stealth checks after a short or long rest in an environment.'},
+                {name:'Camp Security',requirements:'Perception',baseRequirement:'Survivalist',description:'Your adept site preparation provides advantage on any Perception checks to notice approaching creatures while taking a short or long rest.'},
+                {name:'Foraging',requirements:'Stealth',baseRequirement:'Survivalist',description:'When in a natural environment you can feed a number of people up to your Proficiency bonus with a single hard (DC 20) Survival check and 1d4 hours of work.'},
+                {name:'Hide Tracks',requirements:'Stealth',baseRequirement:'Survivalist',description:'You travel in back of your team, hiding your tracks. Raise the DC to track your party by your Proficiency bonus or to DC 20 (hard difficulty), whichever result yields a higher DC.'},
+                {name:'Ranger Tricks',requirements:'',baseRequirement:'Survivalist',description:'During a Traversal encounter, if you succeed at a Terrain card\'s Navigation check, you navigate an additional 1d3 cards from the Journey deck instead of 1.'},
+                {name:'Ration Optimization',requirements:'',baseRequirement:'Survivalist',description:'By managing your team\'s rations and preparing meals with clever use of ingredients, you can keep spirits high. Your team members heal 1 DP during a short rest.'},
+                {name:'Rope Tricks',requirements:'Stealth',baseRequirement:'Survivalist',description:'Your expert knots and efficient use of rope allow your entire team to benefit from your Climbing Kit.'},
+                {name:'Tracking',requirements:'Perception',baseRequirement:'Survivalist',description:'You gain advantage on all Survival checks made to track.'},
+                {name:'Xenosurvival',requirements:'Constitution 13+',baseRequirement:'Survivalist',description:'Once you have taken a short or long rest in an environment, choose a number of additional characters up to your Proficiency bonus to benefit from your Survivalist ability while in the environment until your next rest.'}
+            ],
+            
+            // Class feats by type with requirements from the rules
+            classFeatsByType:{
+                inspiration:[
+                    {name:'Calm and Collected',requirements:'',baseRequirement:'Inspire',description:'During a long rest, choose either Intelligence, Wisdom, or Charisma. Inspired characters gain advantage on the chosen save until your next long rest.'},
+                    {name:'Clear Focus',requirements:'',baseRequirement:'Inspire',description:'During a long rest, choose a skill in which you are proficient. Inspired characters gain advantage on the chosen skill until your next long rest.'},
+                    {name:'Coordinated Fire',requirements:'',baseRequirement:'Inspire',description:'After you hit a target with an attack, you may take a bonus action to grant an inspired character advantage to their next attack roll made before your next turn against the same target.'},
+                    {name:'Defensive Motivation',requirements:'',baseRequirement:'Inspire',description:'Inspired characters gains +1 AC.'},
+                    {name:'Enduring Inspirations',requirements:'',baseRequirement:'Inspire',description:'At the beginning of combat (when Initiative is rolled) each inspired character gains a number of Inspire HP equal to a roll of the tension die. A character cannot have more Inspire HP than the maximum possible result of your Inspire die.'},
+                    {name:'Grim Resolve',requirements:'',baseRequirement:'Inspire',description:'When an inspired character loses their last Inspire HP, they gain resistance to bludgeoning, piercing, and slashing damage until their next turn.'},
+                    {name:'Hard Days Night',requirements:'',baseRequirement:'Inspire',description:'Inspired characters reduce any exhaustion damage they suffer from environmental effects or exertion by 1 level (minimum 1 level). This does not affect attacks that deal exhaustion (such as tranquilizers).'},
+                    {name:'Quippy Comebacks',requirements:'',baseRequirement:'Inspire',description:'Once per Diplomatic Function, inspired characters may halve the amount of DP lost (rounding down) as a result of a failed Diplomatic Action check.'},
+                    {name:'Skillful Explanations',requirements:'',baseRequirement:'Inspire',description:'Once per short rest, when an inspired character fails a skill check that you are proficient in, you may allow the character to re-roll the result.'}
+                ],
+                modification:[
+                    {name:'Armorer',requirements:'',baseRequirement:'Jury Rig',description:'During a long rest, you may choose one character\'s armor. It gains +1 AC until your next long rest. You may choose this modification multiple times; each time you do you may apply the bonus to an additional armor.'},
+                    {name:'Chem Thrower',requirements:'',baseRequirement:'Jury Rig',description:'During a long rest you may choose one weapon with the line or cone quality. It gains +5m to its range until your next long rest. You may choose this modification multiple times; each time you do you may apply the bonus to an additional weapon.'},
+                    {name:'Comms Tech',requirements:'',baseRequirement:'Jury Rig',description:'Your team\'s tactical radio equipment has a range of 20km (instead of 5km). In addition, when you launch a communications balloon, its duration increases to 15d6 hours.'},
+                    {name:'Grenadier',requirements:'',baseRequirement:'Jury Rig',description:'Grenades from your kit deal +1d6 damage when used by you. You may choose this modification multiple times; each time you do your kit\'s grenades deal an additional +1d6 damage when used by you.'},
+                    {name:'Longarm Calibrations',requirements:'',baseRequirement:'Jury Rig',description:'During a long rest you may choose one character\'s Longarm. It gains a +1d4 to attack rolls against targets at long range until your next long rest. You may choose this modification multiple times; each time you do you may apply the bonus to an additional weapon.'},
+                    {name:'Minefield Expert',requirements:'Explosives',baseRequirement:'Jury Rig',description:'You can bury an explosive (such as C4 or a claymore mine) just below the dirt rigged to explode when a character enters the space. This process takes 2 minutes. The explosive affects all targets within a 2m radius. A character must succeed at a DC 20 Perception check to spot the mine before triggering it. Additionally, you gain advantage on all Perception checks to spot buried mines.'},
+                    {name:'Montage',requirements:'',baseRequirement:'Jury Rig',description:'During an episode R&D encounter, reduce the number of successes required by half your Proficiency bonus, to a minimum of 1.'},
+                    {name:'Percussive Maintenance',requirements:'',baseRequirement:'Jury Rig',description:'When a vehicle you are embarked within has the damaged condition, you can take an action to ignore the damaged condition for a number of rounds equal to a roll of the tension die.'},
+                    {name:'Sidearm Calibrations',requirements:'',baseRequirement:'Jury Rig',description:'During a long rest you may choose one character\'s sidearm. It provides a +1d4 to attack rolls against targets at short range until your next long rest. You may choose this modification multiple times, each time you do you may apply the bonus to an additional weapon.'}
+                ],
+                procedure:[
+                    {name:'Biohazard Disposal',requirements:'',baseRequirement:'First Aid',description:'You and your team are considered proficient in Constitution saves against diseases, toxins, and viruses. If a character is already proficient in Constitution saves, they gain no benefit from this procedure.'},
+                    {name:'Controlled Stimulants',requirements:'',baseRequirement:'First Aid',description:'As an action, you may use your Med Kit to heal 1d4 levels of exhaustion. A character may not benefit from this ability again until they have taken a long rest.'},
+                    {name:'Crash Training',requirements:'',baseRequirement:'First Aid',description:'You may use a Med Kit to revive a character who has been dead for a number of rounds up to your Proficiency bonus with a successful DC 25 Medicine check. You may attempt this check once per round.'},
+                    {name:'Embolism',requirements:'',baseRequirement:'First Aid',description:'You may use your Med Kit to make a melee attack that deals 1d3 Constitution damage.'},
+                    {name:'Improvised Medicine',requirements:'',baseRequirement:'First Aid',description:'When you do not have a Med Kit, you may still heal friendly targets as if you had a Med Kit but were not proficient with it.'},
+                    {name:'Pharmaceuticals',requirements:'',baseRequirement:'First Aid',description:'You may use your Med Kit to heal a character of 1d4 Intelligence, Wisdom, or Charisma damage during a short rest. A character may not benefit from this ability again until they have taken a long rest.'},
+                    {name:'Sedatives',requirements:'',baseRequirement:'First Aid',description:'You may administer a sedative to a living target as a melee attack using your Med Kit. If successful, the target must succeed at a Constitution save (DC equal to 10 + Proficiency bonus + Wisdom modifier) or suffer 1d6 levels of fatigue. A target brought to 6 levels of fatigue with this ability is unconscious instead of dead.'},
+                    {name:'Urgent Care',requirements:'',baseRequirement:'First Aid',description:'When you heal with a Med Kit, you may choose to replace all the healing dice rolled with the same number of Tension Dice.'},
+                    {name:'Vital Organ Trauma',requirements:'',baseRequirement:'First Aid',description:'When you critically hit, add your Wisdom modifier to the damage dealt.'}
+                ],
+                discovery:[
+                    {name:'A Moment\'s Thought',requirements:'',baseRequirement:'Eureka',description:'Whenever you take a short or long rest you may spend a Eureka point to re-roll an Intelligence or Wisdom skill check to learn information that you failed since your last rest.'},
+                    {name:'Archaeologist',requirements:'Culture',baseRequirement:'Eureka',description:'As an action you can spend a Eureka point to automatically locate any secret chambers or otherwise hidden rooms within a structure no larger than 20m square per Proficiency bonus. This does not indicate how the secret area may be accessed, only that one must exist (or doesn\'t exist) within the area. In addition, you gain advantage on any Perception checks to find hidden elements of architecture such as secret levers, trap triggers, or hidden doors.'},
+                    {name:'Astronomer',requirements:'Science',baseRequirement:'Eureka',description:'As a bonus action you may reduce the time it takes to activate an astronomical device (including a Stargate) by 1 round per Eureka point spent.'},
+                    {name:'Biologist',requirements:'Medicine',baseRequirement:'Eureka',description:'As an action you may spend any number of Eureka points to heal yourself or a character within 1m for 1d6 damage per Eureka point spent.'},
+                    {name:'Chemist',requirements:'Science',baseRequirement:'Eureka',description:'As an action you may use your Research Kit to make a ranged attack against a target within 5m. If the attack hits, you may spend any number of Eureka points to deal 1d6 acid damage per Eureka point spent. You are proficient with this attack and it uses your Intelligence modifier in place of your Dexterity. This damage increases to 1d8 per Eureka at level 5, 1d10 at level 11, and 1d12 at level 17.'},
+                    {name:'Geologist',requirements:'Science',baseRequirement:'Eureka',description:'When a friendly character within 5m makes an attack against a target in cover from a natural source (stones, trees, a hill), you may make a reaction and spend a Eureka point to negate the effects of that cover for the duration of the attack.'},
+                    {name:'Hyper-Focus',requirements:'',baseRequirement:'Eureka',description:'You may spend one Eureka point to add the tension die to an Intelligence or Wisdom check. You may declare this use of Eureka after learning the results of the roll.'},
+                    {name:'Physicist',requirements:'Science',baseRequirement:'Eureka',description:'When you make an attack with a ranged weapon, you may spend a Eureka to increase the weapon\'s range by half (+50%).'},
+                    {name:'Social Sciences',requirements:'Culture',baseRequirement:'Eureka',description:'Whenever you lose any number of wagered Determination Points, you gain one Eureka point.'}
+                ],
+                tactic:[
+                    {name:'Ambush',requirements:'',description:'You and your team members gain advantage on your first melee attack after any short or long rest.'},
+                    {name:'Assault Coordination',requirements:'',description:'When you hit a target with a ranged attack, the next successful ranged attack by one of your team members deals +1d6 damage.'},
+                    {name:'Coordinated Response',requirements:'',description:'When rolling for initiative, your team members may choose (before the rolls are made) to use your initiative result instead of their own.'},
+                    {name:'Defensive Posture',requirements:'',description:'Add +2 AC to other team members within 2m of you.'},
+                    {name:'Distracting Attacks',requirements:'',description:'When you deal damage to a single target with an attack, you may choose one friendly character not within 2m of you. The target of your attack suffers disadvantage on all attacks against the chosen character until the start of your next turn.'},
+                    {name:'Hit and Run',requirements:'',description:'As a bonus action on your turn you may allow a team member to take a Disengage action.'},
+                    {name:'Overwatchers',requirements:'',description:'During a firefight, when you and your team members take the Overwatch action you cover a 90° field instead of a 45° cone. In addition, you may make two Overwatch attacks (against different targets).'},
+                    {name:'Response Shot',requirements:'',description:'Once per encounter, you may use your reaction to make a ranged attack against an enemy who makes an attack against a team member other than yourself.'},
+                    {name:'Rush',requirements:'',description:'As a bonus action on your turn you may allow a team member to take a Dash action.'}
+                ]
+            },
+
+            // Full class ability descriptions
+            classAbilityDescriptions: {
+                'Diplomat': {
+                    1: [
+                        {
+                            name: 'Inspire',
+                            description: 'Your mere presence inspires your comrades to pursue their mission in a myriad of clever ways. During a long rest, you may grant all team members 1d6 temporary HP with an action (the die rolled is called the Inspire die). These temporary HP last until the next long rest or until removed by damage. While a team member has these temporary hit points (called "Inspired" characters), they gain the benefits of your Inspiration feats. A character may only be Inspired by one source at a time.'
+                        },
+                        {
+                            name: 'Choose 1st Inspiration Feat',
+                            description: 'You are adept at inspiring allies in specific ways. Choose one Inspiration feat at 1st level. An Inspired character gains all of the benefits of your Inspiration feats while they have temporary HP from your Inspire ability.'
+                        }
+                    ],
+                    2: [
+                        {
+                            name: 'Pep Talk',
+                            description: 'You can give a stirring speech to your team. As an action once per mission, you can restore 1d4 Determination points to each member of your team (including yourself).'
+                        },
+                        {
+                            name: 'Word In An Ear',
+                            description: 'You can inspire a single team member within 1m as an action. Roll your Inspire HP die and grant the target Inspire HP as normal. Characters who currently have Inspire HP are immune to this ability. A character may only be targeted by your Word In An Ear once per long rest.'
+                        }
+                    ],
+                    3: [
+                        {
+                            name: 'Force of Will',
+                            description: 'You may use Inspire when you take a short or long rest. Characters already benefiting from your Inspire are immune to a second application.'
+                        },
+                        {
+                            name: 'Choose 2nd Inspiration Feat',
+                            description: 'Select your second Inspiration feat. Inspired characters gain the benefits of all your chosen Inspiration feats.'
+                        }
+                    ],
+                    4: [
+                        {
+                            name: 'Diplomatic Expertise',
+                            description: 'Choose Culture, Insight, or Persuasion. Your Proficiency bonus is doubled for any ability check you make that uses the chosen proficiency.'
+                        },
+                        {
+                            name: 'Ability Score Improvement',
+                            description: 'You can increase your Wisdom or Charisma by +2, or you can increase two ability scores of your choice by +1. As normal, you can\'t increase an ability score above 20 using this feature.'
+                        }
+                    ],
+                    5: [
+                        {
+                            name: 'Strong Personality',
+                            description: 'Your Inspire die increases from 1d6 to 1d8.'
+                        },
+                        {
+                            name: 'Choose 3rd Inspiration Feat',
+                            description: 'Select your third Inspiration feat. Inspired characters gain the benefits of all your chosen Inspiration feats.'
+                        }
+                    ]
+                },
+                'Engineer': {
+                    1: [
+                        {
+                            name: 'Jury Rig',
+                            description: 'You are an expert at field repairs, even when you have to get creative. When you use an engineering kit to repair a machine you heal 2d8 points of damage instead of 2d6. In addition, you may repair an adjacent machine as an action rather than only during a short rest.'
+                        },
+                        {
+                            name: 'Choose 1st Modification Feat',
+                            description: 'You\'ve made special modifications that enhance the effectiveness of you and your team\'s gear. Choose one Modification feat at 1st level.'
+                        }
+                    ],
+                    2: [
+                        {
+                            name: 'Hold Together',
+                            description: 'When you benefit from cover, you gain resistance to the damage of attacks hindered by that cover.'
+                        },
+                        {
+                            name: 'Whack-It',
+                            description: 'You\'ve learned the time-honored technique of a well placed thump. As a bonus action you can give one adjacent machine +1d6 temporary hit points. If this brings the machine\'s HP to above half its normal HP, it begins to function immediately. You may only maintain these temporary HP on one machine at a time.'
+                        }
+                    ],
+                    3: [
+                        {
+                            name: 'Tune-Up',
+                            description: 'You add your Intelligence modifier to the amount repaired whenever you repair a machine or grant a machine temporary HP.'
+                        },
+                        {
+                            name: 'Choose 2nd Modification Feat',
+                            description: 'Select your second Modification feat to enhance your team\'s equipment.'
+                        }
+                    ],
+                    4: [
+                        {
+                            name: 'Broad Spectrum Scanners',
+                            description: 'You can use Intelligence instead of Wisdom when making Perception Checks.'
+                        },
+                        {
+                            name: 'Ability Score Improvement',
+                            description: 'You can increase your Dexterity or Intelligence by +2, or you can increase two ability scores of your choice by +1. As normal, you can\'t increase an ability score above 20 using this feature.'
+                        }
+                    ],
+                    5: [
+                        {
+                            name: 'Xeno-Tech Specialist',
+                            description: 'You have gained a broad understanding of various technologies alien to your home world. When performing an episode R&D encounter, you may use this out-of-the-box thinking to reduce the time required by one stage (minutes requires rounds, hours requires minutes, and so on).'
+                        },
+                        {
+                            name: 'Choose 3rd Modification Feat',
+                            description: 'Select your third Modification feat to enhance your team\'s equipment.'
+                        }
+                    ]
+                },
+                'Medic': {
+                    1: [
+                        {
+                            name: 'First Aid',
+                            description: 'Your extensive training in field medicine allows you to rapidly provide aid to a wounded team member. When you use a med kit to heal, you add your Proficiency bonus to the healed amount. In addition, you may use a med kit to heal a wounded team member as an action (rather than during a short rest). Med kits can only heal the target again until after a short rest.'
+                        },
+                        {
+                            name: 'Choose 1st Procedure Feat',
+                            description: 'You\'ve learned a few advanced medical and scientific procedures you can employ in the field. Choose one Procedure feat at 1st level.'
+                        }
+                    ],
+                    2: [
+                        {
+                            name: 'Triage',
+                            description: 'You can observe a character\'s current physical condition as a bonus action with a DC 20 Medicine check. If successful, you learn the character\'s current and total HP as well as their total hit dice. You suffer disadvantage against a target if you are unfamiliar with its biology.'
+                        },
+                        {
+                            name: 'Unnoticed Field Medic',
+                            description: 'When you heal a team member using first aid, attacks against you suffer disadvantage until your next turn.'
+                        }
+                    ],
+                    3: [
+                        {
+                            name: 'Man Down',
+                            description: 'While you are conscious and within 1m of a dying team member, they require one fewer death saves to stabilize.'
+                        },
+                        {
+                            name: 'Choose 2nd Procedure Feat',
+                            description: 'Select your second Procedure feat to expand your medical expertise.'
+                        }
+                    ],
+                    4: [
+                        {
+                            name: 'Physician Heal Thyself',
+                            description: 'You may use a med kit on yourself as a bonus action.'
+                        },
+                        {
+                            name: 'Ability Score Improvement',
+                            description: 'You can increase your Intelligence or Wisdom by +2, or you can increase two ability scores of your choice by +1. As normal, you can\'t increase an ability score above 20 using this feature.'
+                        }
+                    ],
+                    5: [
+                        {
+                            name: 'First Response',
+                            description: 'You may add your Wisdom modifier to the damage you heal with a med kit. In addition, you may use a med kit to heal a scuffed team member as an action (rather than during a short rest).'
+                        },
+                        {
+                            name: 'Choose 3rd Procedure Feat',
+                            description: 'Select your third Procedure feat to master advanced medical techniques.'
+                        }
+                    ]
+                },
+                'Scientist': {
+                    1: [
+                        {
+                            name: 'Eureka',
+                            description: 'Whenever you fail an Intelligence or Wisdom check during a mission, you gain one Eureka point. You may have a maximum number of Eureka points equal to your Intelligence or Wisdom modifier (whichever is higher). All unspent Eureka points are lost at the end of each mission. Whenever you make an Intelligence or Wisdom check, you may spend one Eureka point to gain advantage.'
+                        },
+                        {
+                            name: 'Choose 1st Discovery Feat',
+                            description: 'Your careful study of scientific principles and your chosen field of study allow you to make insights few others would consider. Choose one Discovery feat at 1st level.'
+                        }
+                    ],
+                    2: [
+                        {
+                            name: 'Apt Analogy',
+                            description: 'You can employ an easy to understand analogy to help others work through complex or esoteric problems. Once per short rest you may grant a friendly character a +TD bonus on an Intelligence or Wisdom skill check.'
+                        },
+                        {
+                            name: 'Great Mind',
+                            description: 'You are difficult to deceive or confuse. You are immune to the Charmed condition, and you gain advantage on any Insight checks to discern lies.'
+                        }
+                    ],
+                    3: [
+                        {
+                            name: 'Cross-discipline Studies',
+                            description: 'You add half your Proficiency bonus, rounded down, to any Intelligence, Wisdom, or Charisma skill check that doesn\'t already include your Proficiency bonus.'
+                        },
+                        {
+                            name: 'Choose 2nd Discovery Feat',
+                            description: 'Select your second Discovery feat to expand your scientific expertise.'
+                        }
+                    ],
+                    4: [
+                        {
+                            name: 'Resilient Mind',
+                            description: 'When you suffer Intelligence, Wisdom, or Charisma damage, reduce the amount of damage suffered by 1 point (minimum 1).'
+                        },
+                        {
+                            name: 'Ability Score Improvement',
+                            description: 'You can increase your Intelligence or Wisdom by +2, or you can increase two ability scores of your choice by +1. As normal, you can\'t increase an ability score above 20 using this feature.'
+                        }
+                    ],
+                    5: [
+                        {
+                            name: 'Casual Genius',
+                            description: 'You begin each mission with a number of Eureka points equal to half your Proficiency bonus (rounding down).'
+                        },
+                        {
+                            name: 'For Science!',
+                            description: 'You may spend a Eureka point to gain advantage on Charisma checks in addition to Intelligence and Wisdom checks.'
+                        },
+                        {
+                            name: 'Choose 3rd Discovery Feat',
+                            description: 'Select your third Discovery feat to master your scientific field.'
+                        }
+                    ]
+                },
+                'Scout': {
+                    1: [
+                        {
+                            name: 'Survivalist',
+                            description: 'You gain resistance to environmental damage (extreme heat, cold, radiation, etc.).'
+                        },
+                        {
+                            name: 'Choose 1st Field Hack Feat',
+                            description: 'Your time in the field has taught you tricks for surviving in hostile environments. Choose one Field Hack feat at 1st level.'
+                        }
+                    ],
+                    2: [
+                        {
+                            name: 'Vanguard',
+                            description: 'When you deal damage to a target within 5m of you, add +1d6 damage.'
+                        },
+                        {
+                            name: 'Trap Rigging',
+                            description: 'You may set traps as an action. The trap deals damage equal to the weapon or explosive used to create it.'
+                        }
+                    ],
+                    3: [
+                        {
+                            name: 'Uncanny Dodge',
+                            description: 'When an attacker that you can see hits you with an attack, you can use your reaction to gain resistance to that attack\'s damage.'
+                        },
+                        {
+                            name: 'Scout\'s Cunning',
+                            description: 'You may take a bonus action to Dash, Disengage, or Hide on your turn.'
+                        }
+                    ],
+                    4: [
+                        {
+                            name: 'Ability Score Improvement',
+                            description: 'You can increase your Dexterity or Constitution by +2, or you can increase two ability scores of your choice by +1. As normal, you can\'t increase an ability score above 20 using this feature.'
+                        },
+                        {
+                            name: 'Choose 2nd Field Hack Feat',
+                            description: 'Select your second Field Hack feat to expand your wilderness expertise.'
+                        }
+                    ],
+                    5: [
+                        {
+                            name: 'Evasion',
+                            description: 'When you are subjected to an effect that allows you to make a Dexterity saving throw to take only half damage, you instead take no damage if you succeed on the saving throw, and only half damage if you fail.'
+                        }
+                    ]
+                },
+                'Soldier': {
+                    1: [
+                        {
+                            name: 'Tactical Flexibility',
+                            description: 'You\'ve learned to direct your team in a variety of tactics. As an action you may activate a Tactic feat that you don\'t know. This tactic lasts for a number of rounds equal to your Charisma modifier (minimum 1). When the duration has run out, you may choose a tactic you know (if any) to re-activate automatically. Once you use this ability, you cannot use it again until you\'ve taken a long rest.'
+                        },
+                        {
+                            name: 'Choose 1st Tactic Feat',
+                            description: 'You\'ve trained extensively with a specific tactic, providing advantages to your team. Your team may benefit from one tactic at a time, and you may change your current tactic to another tactic you know with an action on your turn. Choose one Tactic feat at 1st level.'
+                        }
+                    ],
+                    2: [
+                        {
+                            name: 'Surge',
+                            description: 'You can take an additional action on your turn (even an attack) as a bonus action. You must complete a short or long rest before you can use this ability again.'
+                        },
+                        {
+                            name: 'Rally',
+                            description: 'If you are wounded when initiative is rolled (at the start of an action encounter), you may immediately heal TD Hit Points. Once used, you may not activate this ability again until you take a long rest.'
+                        }
+                    ],
+                    3: [
+                        {
+                            name: 'Martial Training',
+                            description: 'You\'ve trained to deal maximum damage with whatever melee weapon you wield, even improvised weapons. Your minimum damage die for melee weapons or martial arts is 1d8.'
+                        },
+                        {
+                            name: 'Improved Critical',
+                            description: 'Choose a weapon type you are proficient with (such as longarm, sidearm, or common). When using this weapon type you score a critical hit on a 19 or 20 on the die.'
+                        }
+                    ],
+                    4: [
+                        {
+                            name: 'Ability Score Improvement',
+                            description: 'You can increase your Strength or Constitution by +2, or you can increase two ability scores of your choice by +1. As normal, you can\'t increase an ability score above 20 using this feature.'
+                        },
+                        {
+                            name: 'Choose 2nd Tactic Feat',
+                            description: 'Select your second Tactic feat to expand your tactical options in combat.'
+                        }
+                    ],
+                    5: [
+                        {
+                            name: 'Tactical Superiority',
+                            description: 'You may have two tactics in effect at the same time.'
+                        }
+                    ]
+                }
+            },
+
+            races: {
+                'Human': {
+                    subraces: {
+                        'Standard Human (Tau\'ri)': {hitPoints:10,abilityIncrease:{type:'choice',options:['intelligence','charisma'],value:2},abilities:['Recovery: Regain +TD HP on short rest','Galactic Seeds: Advantage on Persuasion/Deception during first contact'],proficiencies:{skills:{type:'choice',count:2}}},
+                        'Abydonian': {hitPoints:10,abilityIncrease:{type:'choice',options:['constitution','charisma'],value:2},abilities:['Recovery: Regain +TD HP on short rest','Free from Ra: Advantage on saves against Goa\'uld technology'],proficiencies:{skills:{type:'choice',count:1},weapons:{type:'choice',count:1}}},
+                        'Tollan': {hitPoints:8,abilityIncrease:{type:'choice',options:['intelligence','wisdom'],value:2},abilities:['Phase-Shift: Add phase device to base kit','Advanced Technology: +TD to Engineering checks for Tech Level 4+'],proficiencies:{skills:{type:'mixed',fixed:['Science'],additionalChoice:{count:1}}}}
+                    }
+                },
+                'Jaffa': {
+                    subraces: {
+                        'Jaffa (With Symbiote)': {hitPoints:12,abilityIncrease:{type:'choice',options:['strength','dexterity'],value:2},abilities:['Symbiote: Advantage on physical saves (once per Proficiency bonus per long rest)','Kelno\'reem: Heal damage as if HD rolled max during long rest'],proficiencies:{weapons:{type:'fixed',list:['Jaffa Weapons']},skills:{type:'choice',count:1}}},
+                        'Free Jaffa (Tretonin)': {hitPoints:10,abilityIncrease:{type:'choice',options:['dexterity','wisdom'],value:2},abilities:['Resistance Training: Half proficiency bonus to attack rolls with non-proficient weapons','Tretonin Prescription: Advantage on saves vs disease, suffer 1d4 Con damage daily without drug'],proficiencies:{weapons:{type:'fixed',list:['Jaffa Weapons']},skills:{type:'choice',count:1}}}
+                    }
+                },
+                'Aturen': {
+                    subraces: {
+                        'Standard Aturen': {hitPoints:10,abilityIncrease:{type:'choice',options:['wisdom','charisma'],value:2},abilities:['Natural Resilience: Advantage on saves against disease or poison','Naturalist: Add +TD to Science checks involving ecosystems and creatures'],proficiencies:{skills:{type:'choice',count:2}}},
+                        'Noxian Pacifist': {hitPoints:8,abilityIncrease:{type:'choice',options:['constitution','charisma'],value:2},abilities:['Natural Resilience: Advantage on saves against disease or poison','Invisibility: Become invisible for 1 minute as action (Prof bonus times per long rest)','Pacifist: Cannot willingly harm living creatures or take attack actions'],proficiencies:{skills:{type:'choice',count:2}}}
+                    }
+                },
+                'Tok\'ra': {
+                    subraces: {
+                        'Tok\'ra (Egeria\'s Line)': {hitPoints:10,abilityIncrease:{type:'choice',options:['intelligence','wisdom'],value:2},abilities:['Synergistic Symbiote: Advantage on mental saves (once per Wis mod per long rest)','Regeneration: Heal to full HP during long rest','Genetic Memory: Access to centuries of knowledge','Naquadah in blood: Can use Goa\'uld/Tok\'ra technology'],proficiencies:{skills:{type:'choice',count:2}}},
+                        'Pangaran Tok\'ra': {hitPoints:10,abilityIncrease:{type:'choice',options:['charisma','wisdom'],value:2},abilities:['Shrewd Diplomats: Use Int or Wis instead of Cha for Persuasion','Regeneration: Heal to full HP during long rest','No genetic memory (created with flaw)'],proficiencies:{skills:{type:'choice',count:2}}}
+                    }
+                },
+                'Unas': {
+                    subraces: {
+                        'Standard Unas': {hitPoints:14,abilityIncrease:{type:'choice',options:['strength','constitution'],value:2},abilities:['Impressive Resilience: Gain damage resistance for TD rounds (once per long rest)','Robust: +4 Str for lifting/carrying, advantage on related Str checks','Claws: Natural weapons deal 1d6 damage'],proficiencies:{skills:{type:'choice',count:2}}},
+                        'Unchained Unas': {hitPoints:14,abilityIncrease:{type:'choice',options:['strength','constitution'],value:2},abilities:['Impressive Resilience: Gain damage resistance for TD rounds (once per long rest)','Underestimated: Advantage on checks to conceal truth from non-Unas','Claws: Natural weapons deal 1d6 damage'],proficiencies:{skills:{type:'choice',count:2}}}
+                    }
+                }
+            },
+
+            classes: {
+                'Diplomat': {hitDie:8,hpPerLevel:5,determinationBonus:2,proficiencies:{armor:['Light Armor'],weapons:['Common Weapons','Sidearms'],tools:['Research Kit'],saves:['Wisdom','Charisma'],skills:['Culture','Deception','Insight','Persuasion']},abilities:{1:['Inspire (1d6 temp HP to team during long rest)','Choose Inspiration feat'],2:['Pep Talk (restore 1d4 DP to team once per mission)','Word In An Ear (inspire single target)'],3:['Force of Will (use Inspire on short/long rest)','Choose 2nd Inspiration feat'],4:['Diplomatic Expertise (double proficiency on chosen skill)','Ability Score Improvement'],5:['Strong Personality (Inspire die to 1d8)','Choose 3rd Inspiration feat']},featChoices:{1:{type:'inspiration',count:1},3:{type:'inspiration',count:1},5:{type:'inspiration',count:1}}},
+                'Engineer': {hitDie:8,hpPerLevel:5,determinationBonus:2,proficiencies:{armor:['Light Armor'],weapons:['Common Weapons','Sidearms','Longarms'],tools:['Engineering Kit','Explosives','Fabrication Kit'],saves:['Dexterity','Intelligence'],skills:['Engineering','Pilot','Perception']},abilities:{1:['Jury Rig (2d8 repair, action repair)','Choose Modification feat'],2:['Hold Together (resistance with cover)','Whack-It (1d6 temp HP bonus action)'],3:['Tune-Up (+Int to repairs)','Choose 2nd Modification feat'],4:['Broad Spectrum Scanners (Int for Perception)','Ability Score Improvement'],5:['Xeno-Tech Specialist (reduce R&D time)','Choose 3rd Modification feat']},featChoices:{1:{type:'modification',count:1},3:{type:'modification',count:1},5:{type:'modification',count:1}}},
+                'Medic': {hitDie:8,hpPerLevel:5,determinationBonus:2,proficiencies:{armor:['Light Armor'],weapons:['Common Weapons','Sidearms','Shotguns'],tools:['Med Kit','Outbreak Kit'],saves:['Dexterity','Wisdom'],skills:['Athletics','Insight','Medicine','Science']},abilities:{1:['First Aid (add proficiency to healing, heal as action)','Choose Procedure feat'],2:['Triage (learn target HP with Medicine check)','Unnoticed Field Medic (disadvantage on attacks after healing)'],3:['Man Down (dying allies need fewer death saves)','Choose 2nd Procedure feat'],4:['Physician Heal Thyself (use med kit on self as bonus action)','Ability Score Improvement'],5:['First Response (add WIS modifier to healing)','Choose 3rd Procedure feat']},featChoices:{1:{type:'procedure',count:1},3:{type:'procedure',count:1},5:{type:'procedure',count:1}}},
+                'Scientist': {hitDie:8,hpPerLevel:5,determinationBonus:2,proficiencies:{armor:['Light Armor'],weapons:['Common Weapons','Sidearms'],tools:['Explosives','Research Kit','Translator'],saves:['Intelligence','Wisdom'],skills:['Culture','Investigation','Nature','Science']},abilities:{1:['Eureka (gain points on Int/Wis failures)','Choose Discovery feat'],2:['Apt Analogy (+TD to ally checks)','Great Mind (immune to charm, advantage vs lies)'],3:['Cross-discipline Studies (half prof to non-proficient)','Choose 2nd Discovery feat'],4:['Resilient Mind (reduce mental damage)','Ability Score Improvement'],5:['Casual Genius (start with Eureka points)','For Science! (Eureka for Cha)','Choose 3rd Discovery feat']},featChoices:{1:{type:'discovery',count:1},3:{type:'discovery',count:1},5:{type:'discovery',count:1}}},
+                'Scout': {hitDie:10,hpPerLevel:6,determinationBonus:1,proficiencies:{armor:['Light Armor'],weapons:['Common Weapons','Martial Arts','Bows','Sidearms','Longarms'],tools:['Camo Kit','Explosives'],saves:['Constitution','Dexterity'],skills:['Perception','Stealth','Survival']},abilities:{1:['Survivalist (resistance to environmental damage)','Choose Field Hack feat'],2:['Vanguard (+1d6 damage within 5m)','Trap Rigging (set traps as action)'],3:['Uncanny Dodge (reaction for resistance)','Scout\'s Cunning (bonus action dash/disengage/hide)'],4:['Ability Score Improvement','Choose 2nd Field Hack feat'],5:['Evasion (half damage on Dex saves)']},featChoices:{1:{type:'fieldHack',count:1},4:{type:'fieldHack',count:1}}},
+                'Soldier': {hitDie:10,hpPerLevel:6,determinationBonus:1,proficiencies:{armor:['Light Armor','Heavy Armor'],weapons:['Common Weapons','Martial Arts','Sidearms','Longarms'],tools:['Camo Kit','Explosives'],saves:['Strength','Constitution'],skills:['Athletics','Intimidation','Pilot']},abilities:{1:['Tactical Flexibility (activate unknown tactic)','Choose Tactic feat'],2:['Surge (extra action, once per rest)','Rally (heal TD HP when wounded at combat start)'],3:['Martial Training (min d8 melee damage)','Improved Critical (19-20 with chosen weapon)'],4:['Ability Score Improvement','Choose 2nd Tactic feat'],5:['Tactical Superiority (two tactics active)']},featChoices:{1:{type:'tactic',count:1},4:{type:'tactic',count:1}}}
+            },
+
+            origins: {
+                biome: [
+                    {name:'Lunar',attribute:'Dexterity +1',ability:'Eager Astronomer: Advantage on Science checks pertaining to astronomy',description:'Your homeland was on a moon. You grew up in slightly lighter gravity, but few sights compare to a sunset eclipsed by the world above. Your three-dimensional awareness developed at an early age, thanks in no small part to the realities of lunar living.'},
+                    {name:'Arboreal',attribute:'Strength +1',ability:'Natural Climber: Climb speed of 6m',description:'A forest or densely wooded area. You might have been branch or floor dwelling, but your life was shaped by the trees. You\'re an expert climber and years of forest living have given you an iron grip.'},
+                    {name:'Mountainous',attribute:'Strength +1',ability:'Vertical Drop: Half falling damage',description:'Steep cliffs, fjords, and high altitudes were the predominant features of your home, and you adapted young to a more vertical life. You\'re no stranger to physical effort, and you\'ve got the strong physical core to show for it.'},
+                    {name:'Artificial',attribute:'Wisdom +1',ability:'Life or Death Repairs: Advantage on engineering when failure would deal damage',description:'Your entire life was within a created environment, such as a space station, underground facility, or bio-dome. You are practical and careful, because you understand artificial environments intuitively.'},
+                    {name:'Oceanic',attribute:'Wisdom +1',ability:'Gifted Swimmer: Swim speed of 6m',description:'Your homeworld\'s vast oceans gave rise to people who knew its tides, reefs, and currents. You grew up with the ocean as a constant companion to be thanked and feared in equal measure.'},
+                    {name:'Desert',attribute:'Charisma +1',ability:'Heat Acclimated: Resistance to fire damage',description:'Whether from sandy dunes or rocky badlands, your homeland was known for its water scarcity and high temperatures. Many worlds see civilizations built on the backs of desert communities that are forced to work together, developing commerce, trade, and the culture\'s first governments.'},
+                    {name:'Rainforest',attribute:'Charisma +1',ability:'Tropics Adept: No disadvantage from rain or fog',description:'The forest canopy blocked out the skies of your world. Your youth was spent among the trees, their trunks and limbs providing for a staggering variety of wildlife and a tightly knit local community.'},
+                    {name:'Grasslands',attribute:'Constitution +1',ability:'Natural Sprinter: +1m movement speed',description:'The rolling savannahs or tilled fields of your home were a bounty for the people in times of peace and a prize to be won in times of war. Clean air, abundant resources, and wide open spaces see many grassland youths grow healthy and tall.'},
+                    {name:'Starship',attribute:'Dexterity +1',ability:'Void Adept: Use Wis for Science checks',description:'You were raised aboard a vessel that travels the void of space, giving you the opportunity to adapt to a variety of environments and to learn a practical view on the sciences.'},
+                    {name:'Terraformed',attribute:'Intelligence +1',ability:'Strange World: 1/day reaction for advantage on save',description:'Your world, or part of it, was drastically altered by artificial means to better support your people. Despite careful planning, life is unpredictable, so you\'ve grown accustomed to planning ahead while being ready for the inevitable unexpected.'},
+                    {name:'Swamp',attribute:'Wisdom +1',ability:'Patient Hunter: Use Wis for Stealth checks',description:'High water lines and dense foliage combine to create slow moving rivers that teem with life. You\'ve learned long ago the value of being unseen, especially when so many of the dangers of your homeland lurked in the shadows of trees or beneath the surface of water.'},
+                    {name:'Toxic',attribute:'Constitution +1',ability:'Toxic Resistance: Resist poison or necrotic (choose one)',description:'Your world\'s environment contains a substance deadly, or at least highly dangerous, to other people of your species. Either through engineering or genetic luck, the members of your culture are immune or at least highly resistant to the toxin.'},
+                    {name:'Urban',attribute:'Intelligence +1',ability:'Melting Pot: Use Cha for Culture checks',description:'Densely packed buildings and the press of people have created the most common artificial environment in the Milky Way. You\'re no stranger to the problem solving required when weaving through complex streets, underground transportation, or crowds.'},
+                    {name:'Tundra',attribute:'Constitution +1',ability:'Cold Acclimated: Resistance to cold damage',description:'The frozen flatlands of your homeland hid much of their bounty beneath the ground. The temperature so rarely rose above freezing that your enduring people could use snow and ice in daily construction.'},
+                    {name:'Volcanic',attribute:'Strength +1',ability:'Heat Acclimated: Resistance to fire damage',description:'Your civilization formed where your world\'s tectonic plates pressed upon one another, making it prone to eruptions of lava and noxious clouds. Volcanic worlds tend to have higher than standard gravity or are extremely mountainous, leading to denizens with steady arms and solid muscle.'},
+                    {name:'Subterranean',attribute:'Dexterity +1',ability:'Improved Vision: Dim light counts as bright',description:'You grew up deep underground in caves or another natural complex, rarely if ever seeing the sky. Due to the real dangers of cave-ins and other dangers of the underworld, your people are quick on their feet with sharp eyes.'}
+                ],
+                background: [
+                    {name:'Enforcement',proficiency:'Intimidation',ability:'Air of Authority: Others have disadvantage to intimidate you',description:'You wielded authority that was not your own to maintain that power, be it in service to a concept like the law or a more concrete patron such as a boss.'},
+                    {name:'Aviator',proficiency:'Pilot',ability:'Crash Landing: Resistance to damage when vehicle crashes',description:'The most common pilots assigned to the Phoenix Site are unsurprisingly drafted from the US Air Force. However, others pilots of more esoteric vessels have been recruited, such as Death Glider pilots and even a blimp/zeppelin operator or two.'},
+                    {name:'Driver',proficiency:'Animal Handling',ability:'Speedster: Vehicles/animals you control gain +1 AC',description:'Whether controlling a team of horses pulling a stagecoach or delivering illicit goods across borders on a dirt bike, the driver has developed skills at steering a vehicle rapidly in a variety of conditions.'},
+                    {name:'Enslaved',proficiency:{type:'choice',options:['Tool'],description:'Choose one tool proficiency'},ability:'Friend to Toil: Suffer 1 less exhaustion level (min 1)',description:'You were recently freed from slavery, either by the SGC or one of its allies. Your life until now has been one of subjugation and toil.'},
+                    {name:'Former Host',ability:'Naquadah Blooded: Can use Goa\'uld tech, advantage vs symbiotes',description:'You once served as a host for a Goa\'uld symbiote (whether hostile or friendly), and your body has forever been altered as a result.'},
+                    {name:'Entertainer',proficiency:'Performance',ability:'Zeitgeist: Use Cha for art/performance understanding',description:'You\'re no stranger to the spotlight. Whether it\'s playing an instrument in a local pub, gracing the stage in a theatrical production, or any number of potential performances, you\'re accustomed to putting on a show.'},
+                    {name:'Freedom Fighter',proficiency:'Stealth',ability:'Last Resorts: Disadvantage on Moxie, advantage on Initiative',description:'The oppression of a Goa\'uld System Lord or another powerful force kept your people in bondage, but you fought back where others were cowed.'},
+                    {name:'Healer',proficiency:'Medicine',ability:'Soothe: Team heals +Prof bonus on rest',description:'You dedicated your life to healing the afflictions people suffer in their bodies and minds.'},
+                    {name:'Military',proficiency:{type:'choice',options:['Weapon','Armor'],description:'Choose one weapon or armor proficiency'},ability:'Drills: +1 HP per level',description:'You served in an organized military or militia, receiving training and maybe even direct combat experience. Note: Human characters who served in the Tau\'ri military may want to select the Tau\'ri military racial origin instead (they do not stack).'},
+                    {name:'Herdsman',proficiency:'Animal Handling',ability:'Beastfriend: Use Cha instead of Wis for Animal Handling',description:'Many cultures make use of animals both as a food source and as a means of labor. Your people made use of flocks and beasts of burden regularly, and you\'ve learned to care for and train beasts.'},
+                    {name:'Preservationist',proficiency:'Nature',ability:'Eye for Nature: Advantage on checks to identify plants',description:'You feel at home in natural environments and wish to see them cared for, even those of other worlds. Perhaps you\'ve witnessed the devastation that can be wrought on a planet by the Jaffa, or you might simply feel driven to protect the natural splendor on display in the Milky Way.'},
+                    {name:'Hunter/Gatherer',proficiency:'Survival',ability:'Irongut: Advantage vs poison',description:'You come from a pre-agricultural society, or at least one who makes use of a commodity that must be hunted or found in the wild. You are thus, an expert at living off the land.'},
+                    {name:'Politician',proficiency:'Persuasion',ability:'Two Faces: Use Int instead of Cha for Deception',description:'Most organized governments have decision makers either appointed by a ruler, elected by the people, or chosen in other more unique ways.'},
+                    {name:'Liaison',proficiency:'Culture',ability:'Stranger to the Land: Advantage on Cha checks to hide foreign nature',description:'Go-betweens and trusted functionaries rise up in nearly every civilization where multiple groups attempt to cohabitate and work together. You\'re one such individual, be it an assistant to a leader, an emissary to a foreign people, or simply a courier who must pass through neighboring lands.'},
+                    {name:'Refugee',proficiency:'Athletics',ability:'New Environments: Advantage on Athletics in unknown wilderness',description:'You were forced to flee your lands for an extended period of time, possibly traveling great distances to seek asylum from the enemies of your enemies.'},
+                    {name:'Merchant',proficiency:'Insight',ability:'Efficient Logistics: +1 bulk capacity',description:'Any civilization that develops money finds itself with professional money makers. It should come as no surprise that an organization like the Phoenix Site has use for such logistical minds, whether they developed their skills as a purveyor of goods directly to the public, or as a middle man procuring goods from other sources.'},
+                    {name:'Sailor',proficiency:'Acrobatics',ability:'Sea Legs: Advantage to maintain balance',description:'Many cultures throughout the Milky Way begin their exploration of the universe with what lies over the horizon of their oceans. Whether in military service or any number of trades, you have learned to keep your footing aboard a naval vessel.'},
+                    {name:'Swindler',proficiency:'Deception',ability:'Low Profile: Use Deception for Stealth in populated areas',description:'You\'ve joined the Phoenix program under false pretenses, having developed a skilled liar\'s tongue and a desire to make your life better. However benign your true motives may be or how close to the truth your lie is, you\'ve at least managed to get attached to a Stargate team, which you qualify as a success.'},
+                    {name:'Scholar',proficiency:'Science',ability:'Preserve Knowledge: Advantage on Persuasion with scholars',description:'Regardless of how your society stored knowledge, you dedicated yourself to some aspect of its collection, dissemination, or preservation.'},
+                    {name:'Teacher',proficiency:'Insight',ability:'Patient Approach: 1/mission use Wis save instead of another',description:'You\'ve spent your life honing minds to pursue knowledge, only to have your limited view of the universe revealed by the Stargate. Now you\'ve joined the Phoenix Site to learn so that you can help educate new recruits.'},
+                    {name:'Sentry',proficiency:'Perception',ability:'Long Night: Ignore first night without rest',description:'While often the task of soldiers, a trained and skilled sentry is a boon to many alien cultures. You\'re trained to keep vigilant and never let your watch falter, a skill that comes in handy in a Phoenix team.'},
+                    {name:'Wright',proficiency:'Engineering',ability:'Measure Twice: Half prof bonus on non-proficient tools',description:'From the first wheelmaker to expert repair technicians, the wright fills a vital role in any civilization. Regardless of your people\'s level of technological advancement, you\'ve learned to approach problems in a pragmatic matter and are quick to learn new mechanical concepts.'},
+                    {name:'Sleuth',proficiency:'Investigation',ability:'The Reveal: Advantage on Persuasion to accuse wrongdoing',description:'With a keen intellect, you\'ve spent time professionally seeking troublesome truths in service of your society\'s laws. A sleuth uncovers those secrets either for themselves, a client, a policing force, or a clandestine organization.'},
+                    {name:'Underworld',proficiency:'Sleight of Hand',ability:'Black Market: Advantage contacting underworld members',description:'Any culture with laws has people who break those laws. You operated in the shadows of your society, and those skills can be useful to Stargate teams looking to procure contraband or lay low in an alien society.'},
+                    {name:'Student',proficiency:'Perception',ability:'Quick Study: 1/mission use Int save instead of another',description:'As with many youth, you were still deciding where life wanted to take you when the lure of the Stargate called. Now your eagerness to learn is directed into the unknown cosmos.'}
+                ],
+                racial: {
+                    'Human': [
+                        {
+                            name:'Tau\'ri Military (Official)',
+                            attribute:'None',
+                            ability:'Basic Training: Proficient in martial arts, longarms, or heavy armor (pick one)',
+                            restrictedTo:['Standard Human (Tau\'ri)'],
+                            isHomebrew:false,
+                            description:'As an operation of the USAF, the Phoenix Site is technically part of the human military. In recent years, General Loyer recruited from other branches of the military. The majority of personnel assigned to the Phoenix Site are from this background.'
+                        },
+                        {
+                            name:'Tau\'ri Military (Homebrew)',
+                            attribute:'choice',
+                            attributeOptions:['Strength +1','Constitution +1'],
+                            ability:'Never Surrender: You gain +1 to attack rolls for each level of exhaustion you have',
+                            restrictedTo:['Standard Human (Tau\'ri)'],
+                            isHomebrew:true,
+                            description:'You\'re an elite soldier from Earth\'s most demanding military programs. Rangers, Special Forces, Marines - you represent the pinnacle of Tau\'ri military excellence. Your training has conditioned you to push harder when others falter. The harsher the conditions become, the more focused and dangerous you are.'
+                        }
+                    ],
+                    'Jaffa': [
+                        {name:'Jaffa Renegade',attribute:'Wisdom +1',ability:'Rebel: Advantage on saves vs Goa\'uld and Jaffa',description:'You served a System Lord as an honored guard, revering the Goa\'uld as gods. But your eyes have opened to their petty nature, so you joined the Phoenix Site for a chance to free the Jaffa people.'},
+                        {name:'Student of Bra\'tac',attribute:'Dexterity +1',ability:'Ma\'tok Mastery: Ma\'tok gains finesse property',description:'You trained under Master Bra\'tac, as a result, you are precise and fluid with a Ma\'tok.'}
+                    ],
+                    'Aturen': [{name:'Aturen Spiritualist',attribute:'None',ability:'Ritual of Life: You can lead a ritual during a short rest to restore the dead to life. ',restrictedTo:['Noxian Pacifist'],description:'You have been chosen, as a student, by the Nox. During your time there, you\'ve been indoctrinated into some of their ancient practices.'}],
+                    'Tok\'ra': [{name:'Tok\'ra Spy',attribute:'Charisma +1',ability:'Passing: Advantage on Deception as Human/Goa\'uld/Jaffa',description:'Working endlessly against the Goa\'uld System Lords, the Tok\'ra employ many spies whose experienced symbiotes can help them infiltrate deep within the Goa\'uld ranks. Tok\'ra spies are integral to the information gathering efforts of the Phoenix Site and frequently find themselves assigned to or leading teams during extraction missions.'}],
+                    'Unas': [{name:'Unas Alpha',attribute:'Charisma +1',ability:'Clan Leader: Other Unas gain advantage on saves/attacks',description:'You were once the alpha of a clan, but either left to join the Phoenix Site or failed to protect them. Among the Unas you are considered a natural leader and many Unas look to you for guidance.'}]
+                }
+            },
+
+            skills: ['Acrobatics','Athletics','Culture','Deception','Engineering','Insight','Intimidation','Investigation','Medicine','Nature','Perception','Performance','Persuasion','Pilot','Science','Sleight of Hand','Stealth','Survival'],
+            weapons: ['Common Weapons','Bows','Martial Arts','Sidearms','Longarms','Shotguns','Grenades','Heavy Ordinance'],
+            armor: ['Light Armor','Heavy Armor'],
+            tools: ['Camo Kit','Explosives','Med Kit','Research Kit','Fabrication Kit','Translator','Engineering Kit','SCUBA','Pan-Cultural Wardrobe','Outbreak Kit']
+        };
+
+        // State
+        let state = {
+            character: {
+                name: '',
+                race: '',
+                subrace: '',
+                abilityChoice: '',
+                origins: [],
+                originChoices: {},
+                raceChoices: {},
+                class: '',
+                level: 1,
+                classFeats: [],
+                duplicateProficiencyChoices: [],
+                abilityScoreImprovements: {},
+                abilityScores: {strength:10,dexterity:10,constitution:10,intelligence:10,wisdom:10,charisma:10},
+                hp: 0,
+                maxHp: 0,
+                determinationPoints: 0,
+                armorClass: 10,
+                speed: 6,
+                initiative: 0,
+                moxie: 0,
+                proficiencies: {armor:[],weapons:[],tools:[],saves:[],skills:[]},
+                bonusFeats: []
+            },
+            showClassFeats: true,
+            showClassAbilities: true,
+            attackSpecialistChoice: ''
+        };
+
+        // Utility functions
+        const getModifier = score => Math.floor((score - 10) / 2);
+        const getProficiencyBonus = level => level <= 4 ? 2 : level <= 8 ? 3 : level <= 12 ? 4 : level <= 16 ? 5 : 6;
+        const pointBuyCost = {8:0,9:1,10:2,11:3,12:4,13:5,14:7,15:9};
+        const getPointsSpent = () => Object.values(state.character.abilityScores).reduce((sum, score) => sum + (pointBuyCost[score] || 0), 0);
+
+        // Helper function to find origin data
+        const findOrigin = (name) => {
+            for (const type of ['biome', 'background']) {
+                const found = gameData.origins[type].find(o => o.name === name);
+                if (found) return found;
+            }
+            for (const race in gameData.origins.racial) {
+                const found = gameData.origins.racial[race].find(o => o.name === name);
+                if (found) return found;
+            }
+            return null;
+        };
+
+        // Helper to get race data
+        const getRaceData = () => gameData.races[state.character.race]?.subraces?.[state.character.subrace];
+        const getClassData = () => gameData.classes[state.character.class];
+
+        const isRacialOriginAvailable = (origin) => {
+            if (!origin.restrictedTo) return true;
+            return origin.restrictedTo.includes(state.character.subrace);
+        };
+
+        // Get proficiency display text for origins
+        const getOriginProficiencyDisplay = (origin) => {
+            if (!origin.proficiency) return '';
+            if (typeof origin.proficiency === 'string') return origin.proficiency;
+            if (origin.proficiency.type === 'choice') {
+                return origin.proficiency.description || 'Choose proficiency';
+            }
+            return '';
+        };
+
+        const getAllSkillProficiencies = () => {
+            const skills = [];
+            const c = state.character;
+            
+            const cd = getClassData();
+            if (cd) {
+                cd.proficiencies.skills.forEach(s => skills.push({skill:s, source:'Class'}));
+            }
+            
+            const rd = getRaceData();
+            if (rd?.proficiencies?.skills) {
+                if (rd.proficiencies.skills.type === 'mixed' && rd.proficiencies.skills.fixed) {
+                    rd.proficiencies.skills.fixed.forEach(s => skills.push({skill:s, source:'Race'}));
+                }
+                if (c.raceChoices.skills) {
+                    c.raceChoices.skills.forEach(s => skills.push({skill:s, source:'Race Choice'}));
+                }
+                if (c.raceChoices.additionalSkills) {
+                    c.raceChoices.additionalSkills.forEach(s => skills.push({skill:s, source:'Race Choice'}));
+                }
+            }
+            
+            c.origins.forEach(o => {
+                const origin = findOrigin(o);
+                if (origin?.proficiency && typeof origin.proficiency === 'string' && gameData.skills.includes(origin.proficiency)) {
+                    skills.push({skill:origin.proficiency, source:o});
+                }
+            });
+            
+            return skills;
+        };
+
+        const getDuplicateAnalysis = () => {
+            const allProfs = getAllSkillProficiencies();
+            const skillCounts = {};
+            
+            allProfs.forEach(({skill}) => {
+                skillCounts[skill] = (skillCounts[skill] || 0) + 1;
+            });
+            
+            const totalReplacements = Object.values(skillCounts).reduce((sum, count) => sum + Math.max(0, count - 1), 0);
+            const duplicateSkills = Object.entries(skillCounts)
+                .filter(([_, count]) => count > 1)
+                .map(([skill, count]) => ({skill, duplicates: count - 1}));
+            
+            return { totalReplacements, duplicateSkills, skillCounts };
+        };
+
+        const getFinalSkillProficiencies = () => {
+            const skills = new Set();
+            const { skillCounts } = getDuplicateAnalysis();
+            
+            Object.keys(skillCounts).forEach(skill => skills.add(skill));
+            state.character.duplicateProficiencyChoices.forEach(skill => {
+                if (skill) skills.add(skill);
+            });
+            
+            return Array.from(skills);
+        };
+
+        const getAbilityBonuses = ability => {
+            let racial = 0, origin = 0, asi = 0;
+            const c = state.character;
+            const rd = getRaceData();
+            
+            if (rd?.abilityIncrease?.type === 'choice' && c.abilityChoice === ability) {
+                racial = rd.abilityIncrease.value;
+            }
+            
+            c.origins.forEach(oName => {
+                const orig = findOrigin(oName);
+                if (orig?.attribute && orig.attribute !== 'None') {
+                    if (orig.attribute === 'choice') {
+                        const chosen = c.originChoices[oName];
+                        if (chosen) {
+                            const [attr, val] = chosen.split(' +');
+                            if (attr.toLowerCase() === ability) origin += parseInt(val);
+                        }
+                    } else {
+                        const [attr, val] = orig.attribute.split(' +');
+                        if (attr.toLowerCase() === ability) origin += parseInt(val);
+                    }
+                }
+            });
+            
+            if (c.level >= 4) {
+                Object.values(c.abilityScoreImprovements).forEach(imp => {
+                    if (imp === ability) asi += 1;
+                    else if (imp === `${ability}_2`) asi += 2;
+                });
+            }
+            
+            return {racial, origin, asi};
+        };
+
+        const getFinalAbilityScores = () => {
+            const scores = {...state.character.abilityScores};
+            Object.keys(scores).forEach(a => {
+                const {racial, origin, asi} = getAbilityBonuses(a);
+                scores[a] += racial + origin + asi;
+            });
+            return scores;
+        };
+
+        const updateDerivedStats = () => {
+            const c = state.character;
+            const rd = getRaceData();
+            const cd = getClassData();
+            const fs = getFinalAbilityScores();
+            const mods = Object.fromEntries(Object.entries(fs).map(([k,v]) => [k, getModifier(v)]));
+            
+            if (rd && cd) {
+                const hpBase = cd.hitDie + mods.constitution + rd.hitPoints + (c.origins.includes('Military') ? c.level : 0);
+                c.hp = c.maxHp = Math.max(1, hpBase + (c.level > 1 ? (c.level - 1) * (cd.hpPerLevel + mods.constitution) : 0));
+            }
+            
+            c.armorClass = 10 + mods.dexterity;
+            c.initiative = Math.max(mods.dexterity, mods.wisdom);
+            c.moxie = Math.max(mods.intelligence, mods.charisma);
+            c.speed = c.origins.includes('Grasslands') ? 7 : 6;
+            c.determinationPoints = Math.floor((c.level + 4) / 5) * 2 + (cd?.determinationBonus || 0);
+        };
+
+        const getProficiencyDescription = (proficiencies) => {
+            const descriptions = [];
+            
+            if (proficiencies?.skills) {
+                if (proficiencies.skills.type === 'choice') {
+                    descriptions.push(`Choose ${proficiencies.skills.count} skill${proficiencies.skills.count > 1 ? 's' : ''}`);
+                } else if (proficiencies.skills.type === 'mixed') {
+                    const fixedSkills = proficiencies.skills.fixed.join(', ');
+                    descriptions.push(`${fixedSkills} (fixed)`);
+                    if (proficiencies.skills.additionalChoice) {
+                        descriptions.push(`Choose ${proficiencies.skills.additionalChoice.count} additional skill${proficiencies.skills.additionalChoice.count > 1 ? 's' : ''}`);
+                    }
+                }
+            }
+            
+            if (proficiencies?.weapons) {
+                if (proficiencies.weapons.type === 'choice') {
+                    descriptions.push(`Choose ${proficiencies.weapons.count} weapon proficiency`);
+                } else if (proficiencies.weapons.type === 'fixed') {
+                    descriptions.push(`${proficiencies.weapons.list.join(', ')} (fixed)`);
+                }
+            }
+            
+            return descriptions;
+        };
+
+        const exportCharacter = () => {
+            const c = state.character;
+            const rd = getRaceData();
+            const cd = getClassData();
+            const fs = getFinalAbilityScores();
+            
+            let classAbilities = [];
+            if (cd && gameData.classAbilityDescriptions[c.class]) {
+                Object.entries(gameData.classAbilityDescriptions[c.class]).forEach(([level, abilities]) => {
+                    if (parseInt(level) <= c.level) {
+                        abilities.forEach(ability => {
+                            classAbilities.push(`• Level ${level} - ${ability.name}: ${ability.description}`);
+                        });
+                    }
+                });
+            }
+            
+            let selectedFeats = [];
+            c.classFeats.forEach(featName => {
+                let feat = null;
+                if (c.class === 'Scout') {
+                    feat = gameData.fieldHackFeats.find(f => f.name === featName);
+                } else {
+                    Object.values(gameData.classFeatsByType).forEach(typeFeats => {
+                        const found = typeFeats.find(f => f.name === featName);
+                        if (found) feat = found;
+                    });
+                }
+                if (feat) {
+                    selectedFeats.push(`• ${feat.name}: ${feat.description}`);
+                }
+            });
+            
+            let originsWithEffects = [];
+            c.origins.forEach(originName => {
+                const origin = findOrigin(originName);
+                
+                if (origin) {
+                    let effects = [];
+                    if (origin.attribute && origin.attribute !== 'None') {
+                        if (origin.attribute === 'choice' && c.originChoices[originName]) {
+                            effects.push(c.originChoices[originName]);
+                        } else if (origin.attribute !== 'choice') {
+                            effects.push(origin.attribute);
+                        }
+                    }
+                    if (origin.proficiency) {
+                        const prof = typeof origin.proficiency === 'string' ? 
+                                    `Proficiency: ${origin.proficiency}` : 
+                                    origin.proficiency.type === 'choice' ? 
+                                    (c.originChoices[originName] ? `Proficiency: ${c.originChoices[originName]}` : `Proficiency: Choice not yet made`) : 
+                                    'Special';
+                        effects.push(prof);
+                    }
+                    if (origin.ability) effects.push(origin.ability);
+                    originsWithEffects.push(`• ${originName}${origin.isHomebrew ? ' (Homebrew)' : ''}: ${effects.join(', ')}`);
+                }
+            });
+            
+            let additionalProfs = [];
+            if (c.raceChoices.weapons?.length > 0) {
+                additionalProfs.push(`Weapons: ${c.raceChoices.weapons.join(', ')}`);
+            }
+            
+            if (c.origins.includes('Tau\'ri Military (Official)') && c.originChoices['Tau\'ri Military (Official)']) {
+                additionalProfs.push(`Basic Training: ${c.originChoices['Tau\'ri Military (Official)']}`);
+            }
+            
+            const sheet = `STARGATE RPG CHARACTER SHEET
+${'='.repeat(50)}
+
+## BASIC INFORMATION
+
+Name: ${c.name || 'Unnamed Character'}
+Race: ${c.race} (${c.subrace})
+Class: ${c.class}
+Level: ${c.level}
+
+## ABILITY SCORES
+
+Strength:     ${fs.strength} (${getModifier(fs.strength) >= 0 ? '+' : ''}${getModifier(fs.strength)})
+Dexterity:    ${fs.dexterity} (${getModifier(fs.dexterity) >= 0 ? '+' : ''}${getModifier(fs.dexterity)})
+Constitution: ${fs.constitution} (${getModifier(fs.constitution) >= 0 ? '+' : ''}${getModifier(fs.constitution)})
+Intelligence: ${fs.intelligence} (${getModifier(fs.intelligence) >= 0 ? '+' : ''}${getModifier(fs.intelligence)})
+Wisdom:       ${fs.wisdom} (${getModifier(fs.wisdom) >= 0 ? '+' : ''}${getModifier(fs.wisdom)})
+Charisma:     ${fs.charisma} (${getModifier(fs.charisma) >= 0 ? '+' : ''}${getModifier(fs.charisma)})
+
+## COMBAT STATISTICS
+
+Hit Points: ${c.hp}/${c.maxHp}
+Armor Class: ${c.armorClass}
+Initiative: ${c.initiative >= 0 ? '+' : ''}${c.initiative}
+Speed: ${c.speed}m
+Determination Points: ${c.determinationPoints}
+Moxie: ${c.moxie >= 0 ? '+' : ''}${c.moxie}
+Proficiency Bonus: +${getProficiencyBonus(c.level)}
+
+## SKILL PROFICIENCIES
+
+${getFinalSkillProficiencies().join(', ')}
+
+## CLASS BONUSES
+
+Saving Throws: ${cd ? cd.proficiencies.saves.join(', ') : 'None'}
+Armor: ${cd ? cd.proficiencies.armor.join(', ') : 'None'}
+Weapons: ${cd ? cd.proficiencies.weapons.join(', ') : 'None'}
+Tools: ${cd ? cd.proficiencies.tools.join(', ') : 'None'}
+
+${additionalProfs.length > 0 ? `## ADDITIONAL PROFICIENCIES (from Race/Origin)
+
+${additionalProfs.join('\n')}` : ''}
+
+## CLASS ABILITIES
+
+${classAbilities.length > 0 ? classAbilities.join('\n\n') : '• None'}
+
+## CLASS FEATS SELECTED
+
+${selectedFeats.length > 0 ? selectedFeats.join('\n') : '• None'}
+
+## ORIGINS
+
+${originsWithEffects.join('\n')}
+
+## RACIAL ABILITIES
+
+${rd ? rd.abilities.map(a => `• ${a}`).join('\n') : '• None'}
+
+${c.level >= 4 && Object.keys(c.abilityScoreImprovements).length > 0 ? `## ABILITY SCORE IMPROVEMENTS (Level 4)
+
+${Object.entries(c.abilityScoreImprovements).map(([key, value]) => {
+    if (value.endsWith('_2')) return `• ${value.replace('_2', '')} +2`;
+    return `• ${value} +1`;
+}).join('\n')}` : ''}
+
+${c.level === 5 && state.attackSpecialistChoice ? `## BONUS FEAT (Level 5)
+
+- Attack Specialist (${state.attackSpecialistChoice}): +1 to attack and damage rolls` : ''}`;
+
+            const blob = new Blob([sheet], {type: 'text/plain'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `${c.name || 'character'}_stargate_rpg.txt`;
+            a.click();
+        };
+
+        // Rendering helper
+        const section = (title, content, highlight = false) => `
+            <div class="${highlight ? 'bg-yellow-500/20 border-2 border-yellow-500' : 'bg-gray-700/50'} rounded-lg p-4">
+                ${title ? `<label class="block text-sm font-medium ${highlight ? 'text-yellow-300' : 'text-gray-300'} mb-2">${title}</label>` : ''}
+                ${content}
+            </div>
+        `;
+
+        // Button renderer
+        const renderButton = (data, selected, disabled = false, classes = '') => {
+            const baseClasses = 'p-3 rounded-lg border-2 transition-all';
+            const stateClasses = selected ? 'border-blue-500 bg-blue-500/20 text-white' : 
+                                disabled ? 'border-gray-600 bg-gray-800 opacity-50 cursor-not-allowed' :
+                                'border-gray-600 bg-gray-800 text-gray-300 hover:border-gray-500';
+            return `${baseClasses} ${stateClasses} ${classes}`;
+        };
+
+        // Main render function
+        const render = () => {
+            updateDerivedStats();
+            
+            const { totalReplacements } = getDuplicateAnalysis();
+            
+            if (totalReplacements !== state.character.duplicateProficiencyChoices.length) {
+                state.character.duplicateProficiencyChoices = new Array(totalReplacements).fill('');
+            }
+            
+            document.getElementById('app').innerHTML = `
+                <div class="max-w-7xl mx-auto">
+                    <div class="bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-2xl border border-blue-500/30">
+                        <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-6 rounded-t-lg">
+                            <h1 class="text-3xl font-bold text-white flex items-center gap-3">
+                                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">${icons.target}</div>
+                                Stargate RPG Character Builder
+                            </h1>
+                            <p class="text-blue-100 mt-2">Create your Phoenix Site operative (Levels 1-5)</p>
+                        </div>
+                        
+                        <div class="p-6 space-y-6">
+                            ${renderSections()}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            attachEventListeners();
+        };
+
+        const renderSections = () => {
+            const c = state.character;
+            const rd = getRaceData();
+            const cd = getClassData();
+            const { totalReplacements, duplicateSkills } = getDuplicateAnalysis();
+            const ps = getPointsSpent();
+            
+            const sections = [];
+            
+            // Character name
+            sections.push(section('Character Name', `
+                <input id="character-name" value="${c.name}" class="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white" placeholder="Enter character name..."/>
+            `));
+            
+            // Race selection
+            sections.push(section('Select Race', `
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    ${Object.keys(gameData.races).map(race => `
+                        <button data-race="${race}" class="race-btn ${renderButton(null, c.race === race)}">
+                            <div class="font-semibold">${race}</div>
+                            <div class="text-xs mt-1 opacity-75">${Object.keys(gameData.races[race].subraces).length} variant(s)</div>
+                        </button>
+                    `).join('')}
+                </div>
+            `));
+            
+            // Subrace selection
+            if (c.race) {
+                sections.push(section(`Select ${c.race} Variant`, Object.entries(gameData.races[c.race].subraces).map(([name, data]) => {
+                    const profDesc = getProficiencyDescription(data.proficiencies);
+                    return `
+                        <div data-subrace="${name}" class="subrace-btn p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                            c.subrace === name ? 'border-green-500 bg-green-500/20' : 'border-gray-600 bg-gray-800 hover:border-gray-500'
+                        }">
+                            <div class="font-semibold text-white mb-2">${name}</div>
+                            <div class="text-xs text-gray-400 space-y-1">
+                                <div>HP Bonus: +${data.hitPoints}</div>
+                                <div class="flex items-start gap-1">
+                                    <span>Ability Increase:</span>
+                                    <span class="${data.abilityIncrease.type === 'choice' ? 'text-yellow-300' : 'text-gray-400'}">
+                                        ${data.abilityIncrease.type === 'choice' ? 
+                                            `${icons.alertCircle} Choose ONE: +${data.abilityIncrease.value} to ${data.abilityIncrease.options.join(' OR ')}`
+                                            : 
+                                            'Fixed bonuses'
+                                        }
+                                    </span>
+                                </div>
+                                
+                                ${profDesc.length > 0 ? `
+                                    <div class="mt-2">
+                                        <span class="font-semibold text-gray-300">Proficiencies:</span>
+                                        <ul class="ml-2 mt-1">
+                                            ${profDesc.map(desc => `
+                                                <li class="text-xs text-blue-300">• ${desc}</li>
+                                            `).join('')}
+                                        </ul>
+                                    </div>
+                                ` : ''}
+                                
+                                <div class="mt-2">
+                                    <span class="font-semibold text-gray-300">Abilities:</span>
+                                    <ul class="ml-2 mt-1">
+                                        ${data.abilities.map(a => `<li class="text-xs">• ${a}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('')));
+            }
+            
+            // Ability choice
+            if (rd?.abilityIncrease?.type === 'choice') {
+                sections.push(section('Choose ONE Ability Score Increase (+' + rd.abilityIncrease.value + ')', `
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        ${rd.abilityIncrease.options.map(a => `
+                            <button data-ability-choice="${a}" class="ability-choice-btn p-3 rounded capitalize transition-all font-semibold ${
+                                c.abilityChoice === a ? 'bg-purple-500/20 border-2 border-purple-500 text-white' : 'bg-gray-800 border-2 border-gray-600 text-gray-300 hover:border-gray-500'
+                            }">
+                                ${a}
+                                ${c.abilityChoice === a ? '<div class="text-xs mt-1 text-purple-300">✓ Selected</div>' : ''}
+                            </button>
+                        `).join('')}
+                    </div>
+                `, !c.abilityChoice));
+            }
+            
+            // Race weapon proficiencies
+            if (rd?.proficiencies?.weapons?.type === 'choice') {
+                sections.push(section(`Choose ${rd.proficiencies.weapons.count} Weapon Proficienc${rd.proficiencies.weapons.count > 1 ? 'ies' : 'y'}`, `
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        ${gameData.weapons.map(w => {
+                            const sel = c.raceChoices.weapons?.includes(w);
+                            const max = c.raceChoices.weapons?.length >= rd.proficiencies.weapons.count;
+                            return `<button data-race-weapon="${w}" class="race-weapon-btn p-2 rounded text-xs transition-all ${
+                                sel ? 'bg-green-500/20 border border-green-500 text-white' : 
+                                max && !sel ? 'bg-gray-800 border border-gray-600 text-gray-300 opacity-50' : 
+                                'bg-gray-800 border border-gray-600 text-gray-300 hover:border-gray-500'
+                            }">${w}</button>`;
+                        }).join('')}
+                    </div>
+                `));
+            }
+            
+            // Race proficiencies
+            if (rd?.proficiencies?.skills) {
+                const skillContent = rd.proficiencies.skills.type === 'choice' ? `
+                    <div class="grid grid-cols-3 md:grid-cols-4 gap-2">
+                        ${gameData.skills.map(s => {
+                            const sel = c.raceChoices.skills?.includes(s);
+                            const max = c.raceChoices.skills?.length >= rd.proficiencies.skills.count;
+                            return `<button data-race-skill="${s}" class="race-skill-btn p-2 rounded text-xs transition-all ${
+                                sel ? 'bg-green-500/20 border border-green-500 text-white' : 
+                                max && !sel ? 'bg-gray-800 border border-gray-600 text-gray-300 opacity-50' : 
+                                'bg-gray-800 border border-gray-600 text-gray-300 hover:border-gray-500'
+                            }">${s}</button>`;
+                        }).join('')}
+                    </div>
+                ` : rd.proficiencies.skills.type === 'mixed' ? `
+                    <div class="mb-4">
+                        <span class="text-sm font-medium text-gray-300">Fixed Skill Proficiencies</span>
+                        <div class="flex gap-2 mt-2">
+                            ${rd.proficiencies.skills.fixed.map(skill => `
+                                <span class="px-3 py-1 bg-blue-500/20 border border-blue-500 text-blue-300 rounded text-sm">
+                                    ${skill} (Automatic)
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ${rd.proficiencies.skills.additionalChoice ? `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">
+                                Choose ${rd.proficiencies.skills.additionalChoice.count} Additional Skill Proficienc${rd.proficiencies.skills.additionalChoice.count > 1 ? 'ies' : 'y'}
+                            </label>
+                            <div class="grid grid-cols-3 md:grid-cols-4 gap-2">
+                                ${gameData.skills.filter(s => !rd.proficiencies.skills.fixed.includes(s)).map(s => {
+                                    const sel = c.raceChoices.additionalSkills?.includes(s);
+                                    const max = c.raceChoices.additionalSkills?.length >= rd.proficiencies.skills.additionalChoice.count;
+                                    return `<button data-additional-skill="${s}" class="additional-skill-btn p-2 rounded text-xs transition-all ${
+                                        sel ? 'bg-green-500/20 border border-green-500 text-white' : 
+                                        max && !sel ? 'bg-gray-800 border border-gray-600 text-gray-300 opacity-50' : 
+                                        'bg-gray-800 border border-gray-600 text-gray-300 hover:border-gray-500'
+                                    }">${s}</button>`;
+                                }).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                ` : '';
+                
+                sections.push(section(rd.proficiencies.skills.type === 'choice' ? `Choose ${rd.proficiencies.skills.count} Skill Proficienc${rd.proficiencies.skills.count > 1 ? 'ies' : 'y'}` : 'Skill Proficiencies', skillContent));
+            }
+            
+            // Origins with descriptions
+            sections.push(section('Select Origins (Choose 2 from different categories)', `
+                ${['biome', 'background'].map(type => `
+                    <div class="mb-4">
+                        <h3 class="text-sm font-semibold text-gray-400 mb-2">${type[0].toUpperCase() + type.slice(1)} Origins</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-96 overflow-y-auto p-1">
+                            ${gameData.origins[type].map(o => {
+                                const sel = c.origins.includes(o.name);
+                                const hasType = c.origins.some(x => gameData.origins[type].find(y => y.name === x));
+                                const dis = !sel && (c.origins.length >= 2 || hasType);
+                                const isIncompatible = o.name === 'Former Host' && c.race === 'Jaffa';
+                                const proficiencyDisplay = getOriginProficiencyDisplay(o);
+                                
+                                return `
+                                    <button data-origin="${o.name}" data-origin-type="${type}" class="origin-btn p-3 text-left rounded border transition-all ${
+                                        sel ? 'border-blue-500 bg-blue-500/20' : 
+                                        isIncompatible ? 'border-red-600 bg-red-900/20 opacity-50 cursor-not-allowed' :
+                                        dis ? 'border-gray-600 bg-gray-800 opacity-50' : 
+                                        'border-gray-600 bg-gray-800 hover:border-gray-500'
+                                    }">
+                                        <div class="font-semibold text-sm text-white">
+                                            ${o.name}
+                                            ${isIncompatible ? '<span class="text-xs text-red-400">(Incompatible with Jaffa)</span>' : ''}
+                                        </div>
+                                        ${o.description ? `<div class="text-xs text-gray-300 italic mt-1 mb-2">${o.description}</div>` : ''}
+                                        <div class="text-xs text-green-400 mt-1">
+                                            ${o.attribute !== 'None' && o.attribute ? o.attribute : ''}
+                                            ${proficiencyDisplay ? (o.attribute && o.attribute !== 'None' ? ' | ' : '') + proficiencyDisplay : ''}
+                                        </div>
+                                        <div class="text-xs text-gray-400">${o.ability}</div>
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `).join('')}
+                
+                ${c.race && gameData.origins.racial[c.race] ? `
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-400 mb-2">Racial Origins (${c.race})</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            ${gameData.origins.racial[c.race].map(o => {
+                                const sel = c.origins.includes(o.name);
+                                const disabled = !sel && c.origins.length >= 2;
+                                const notAvailable = !isRacialOriginAvailable(o);
+                                const proficiencyDisplay = getOriginProficiencyDisplay(o);
+                                const displayName = o.name.replace(/ \((Official|Homebrew)\)$/, '');
+                                
+                                return `
+                                    <button data-origin="${o.name}" data-origin-type="racial" class="origin-btn p-3 text-left rounded border transition-all ${
+                                        sel ? 'border-blue-500 bg-blue-500/20' : 
+                                        notAvailable ? 'border-red-600 bg-red-900/20 opacity-50 cursor-not-allowed' :
+                                        disabled ? 'border-gray-600 bg-gray-800 opacity-50' : 
+                                        'border-gray-600 bg-gray-800 hover:border-gray-500'
+                                    }">
+                                        <div class="font-semibold text-sm text-white">
+                                            ${displayName}
+                                            ${o.isHomebrew ? '<span class="text-yellow-300 text-xs">(Homebrew)</span>' : ''}
+                                            ${notAvailable ? `<span class="text-xs text-red-400">(Only for ${o.restrictedTo.join(', ')})</span>` : ''}
+                                        </div>
+                                        ${o.description ? `<div class="text-xs text-gray-300 italic mt-1 mb-2">${o.description}</div>` : ''}
+                                        <div class="text-xs text-green-400 mt-1">
+                                            ${o.attribute !== 'None' && o.attribute !== 'choice' && o.attribute ? o.attribute : ''}
+                                            ${o.attribute === 'choice' && o.attributeOptions ? `Choose: ${o.attributeOptions.join(' OR ')}` : ''}
+                                            ${proficiencyDisplay ? (o.attribute && o.attribute !== 'None' ? ' | ' : '') + proficiencyDisplay : ''}
+                                        </div>
+                                        <div class="text-xs text-gray-400">${o.ability}</div>
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            `));
+            
+            // Origin proficiency choices
+            const originsWithChoices = c.origins.filter(o => {
+                const origin = findOrigin(o);
+                return origin?.proficiency?.type === 'choice' || origin?.attribute === 'choice' || o === 'Tau\'ri Military (Official)';
+            });
+            
+            if (originsWithChoices.length > 0) {
+                sections.push(section('Origin Choices', originsWithChoices.map(originName => {
+                    const origin = findOrigin(originName);
+                    let content = '';
+                    
+                    // Handle special origins that need choices
+                    if (originName === 'Tau\'ri Military (Official)') {
+                        const basicTrainingOptions = ['Martial Arts', 'Longarms', 'Heavy Armor'];
+                        content += `
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-300 mb-2">
+                                    Tau'ri Military - Choose Basic Training:
+                                </label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    ${basicTrainingOptions.map(option => `
+                                        <button data-origin-choice="${originName}" data-choice="${option}" 
+                                            class="origin-choice-btn p-2 rounded text-xs transition-all ${
+                                                c.originChoices[originName] === option ? 
+                                                'bg-green-500/20 border border-green-500 text-white' : 
+                                                'bg-gray-800 border border-gray-600 text-gray-300 hover:border-gray-500'
+                                            }">
+                                            ${option}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    // Handle attribute choice
+                    if (origin?.attribute === 'choice' && origin?.attributeOptions) {
+                        content += `
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-300 mb-2">
+                                    ${originName.replace(/ \((Official|Homebrew)\)$/, '')} - Choose one attribute:
+                                </label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    ${origin.attributeOptions.map(attr => `
+                                        <button data-origin-choice="${originName}" data-choice="${attr}" 
+                                            class="origin-choice-btn p-2 rounded text-xs transition-all ${
+                                                c.originChoices[originName] === attr ? 
+                                                'bg-green-500/20 border border-green-500 text-white' : 
+                                                'bg-gray-800 border border-gray-600 text-gray-300 hover:border-gray-500'
+                                            }">
+                                            ${attr}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    // Handle other proficiency choices
+                    if (origin?.proficiency?.type === 'choice' && origin?.proficiency?.options) {
+                        if (originName === 'Military') {
+                            const militaryWeapons = ['Common Weapons','Martial Arts','Sidearms','Longarms','Shotguns'];
+                            const militaryArmor = ['Light Armor','Heavy Armor'];
+                            content += `
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                                        Military Origin - Choose one weapon or armor proficiency:
+                                    </label>
+                                    <div class="mb-2">
+                                        <div class="text-xs text-gray-400 mb-2">Weapon Proficiencies:</div>
+                                        <div class="grid grid-cols-3 gap-2">
+                                            ${militaryWeapons.map(weapon => `
+                                                <button data-origin-choice="${originName}" data-choice="${weapon}" 
+                                                    class="origin-choice-btn p-2 rounded text-xs transition-all ${
+                                                        c.originChoices[originName] === weapon ? 
+                                                        'bg-green-500/20 border border-green-500 text-white' : 
+                                                        'bg-gray-800 border border-gray-600 text-gray-300 hover:border-gray-500'
+                                                    }">
+                                                    ${weapon}
+                                                </button>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs text-gray-400 mb-2">Armor Proficiencies:</div>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            ${militaryArmor.map(armor => `
+                                                <button data-origin-choice="${originName}" data-choice="${armor}" 
+                                                    class="origin-choice-btn p-2 rounded text-xs transition-all ${
+                                                        c.originChoices[originName] === armor ? 
+                                                        'bg-green-500/20 border border-green-500 text-white' : 
+                                                        'bg-gray-800 border border-gray-600 text-gray-300 hover:border-gray-500'
+                                                    }">
+                                                    ${armor}
+                                                </button>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        } else if (originName === 'Enslaved') {
+                            content += `
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                                        Enslaved Origin - Choose one tool proficiency:
+                                    </label>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        ${gameData.tools.map(tool => `
+                                            <button data-origin-choice="${originName}" data-choice="${tool}" 
+                                                class="origin-choice-btn p-2 rounded text-xs transition-all ${
+                                                    c.originChoices[originName] === tool ? 
+                                                    'bg-green-500/20 border border-green-500 text-white' : 
+                                                    'bg-gray-800 border border-gray-600 text-gray-300 hover:border-gray-500'
+                                                }">
+                                                ${tool}
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
+                    
+                    return content;
+                }).join('')));
+            }
+            
+            // Class selection
+            sections.push(section('Select Class', `
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    ${Object.entries(gameData.classes).map(([name, data]) => `
+                        <button data-class="${name}" class="class-btn ${renderButton(null, c.class === name)}">
+                            <div class="font-semibold">${name}</div>
+                            <div class="text-xs mt-1 opacity-75">HD: d${data.hitDie}, DP: +${data.determinationBonus}</div>
+                        </button>
+                    `).join('')}
+                </div>
+            `));
+            
+            // Class info
+            if (cd) {
+                sections.push(section(`${c.class} Class Proficiencies & Bonuses`, `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div class="bg-gray-800 rounded p-3">
+                            <div class="text-xs font-semibold text-purple-400 mb-2">Combat</div>
+                            <div class="space-y-1 text-xs text-gray-300">
+                                <div>Hit Die: d${cd.hitDie}</div>
+                                <div>HP/Level: ${cd.hpPerLevel} + Con mod</div>
+                                <div>Determination: +${cd.determinationBonus}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-800 rounded p-3">
+                            <div class="text-xs font-semibold text-blue-400 mb-2">Saving Throws</div>
+                            <div class="text-xs text-gray-300">${cd.proficiencies.saves.join(', ')}</div>
+                        </div>
+                        
+                        <div class="bg-gray-800 rounded p-3">
+                            <div class="text-xs font-semibold text-green-400 mb-2">Armor & Weapons</div>
+                            <div class="space-y-1 text-xs text-gray-300">
+                                <div><span class="text-gray-500">Armor:</span> ${cd.proficiencies.armor.join(', ')}</div>
+                                <div><span class="text-gray-500">Weapons:</span> ${cd.proficiencies.weapons.join(', ')}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-800 rounded p-3">
+                            <div class="text-xs font-semibold text-yellow-400 mb-2">Tools</div>
+                            <div class="text-xs text-gray-300">${cd.proficiencies.tools.join(', ')}</div>
+                        </div>
+                        
+                        <div class="bg-gray-800 rounded p-3 md:col-span-2">
+                            <div class="text-xs font-semibold text-cyan-400 mb-2">Skills</div>
+                            <div class="text-xs text-gray-300">${cd.proficiencies.skills.join(', ')}</div>
+                        </div>
+                    </div>
+                `));
+            }
+            
+            // Level selection
+            sections.push(section('Character Level', `
+                <div class="grid grid-cols-5 gap-2">
+                    ${[1,2,3,4,5].map(lvl => `
+                        <button data-level="${lvl}" class="level-btn px-3 py-2 rounded-lg border-2 transition-all text-sm ${
+                            c.level === lvl ? 'border-green-500 bg-green-500/20 text-white' : 'border-gray-600 bg-gray-800 text-gray-300 hover:border-gray-500'
+                        }">${lvl}</button>
+                    `).join('')}
+                </div>
+            `));
+            
+            // Class abilities
+            if (cd && c.level > 0 && gameData.classAbilityDescriptions[c.class]) {
+                sections.push(section('', `
+                    <div id="toggle-abilities" class="flex items-center justify-between cursor-pointer">
+                        <h3 class="text-lg font-semibold text-gray-300 flex items-center gap-2">
+                            ${icons.bookOpen} ${c.class} Class Abilities (Levels 1-${c.level})
+                        </h3>
+                        <span class="${state.showClassAbilities ? 'rotate-180' : ''} transition-transform">${icons.chevronDown}</span>
+                    </div>
+                    
+                    ${state.showClassAbilities ? `
+                        <div class="mt-4 space-y-3">
+                            ${Object.entries(gameData.classAbilityDescriptions[c.class])
+                                .filter(([level]) => parseInt(level) <= c.level)
+                                .map(([level, abilities]) => `
+                                    <div class="bg-gray-800 rounded-lg p-4">
+                                        <div class="text-sm font-semibold text-purple-400 mb-3">Level ${level}</div>
+                                        <div class="space-y-3">
+                                            ${abilities.map(ability => `
+                                                <div class="pl-3 border-l-2 border-gray-700">
+                                                    <div class="text-sm font-medium text-white mb-1">${ability.name}</div>
+                                                    <div class="text-xs text-gray-400">${ability.description}</div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                        </div>
+                    ` : ''}
+                `));
+            }
+            
+            // Class feats - NO REQUIREMENTS
+            if (cd?.featChoices) {
+                let req = 0, type = null;
+                Object.entries(cd.featChoices).forEach(([l, ch]) => {
+                    if (parseInt(l) <= c.level) {
+                        req += ch.count;
+                        type = ch.type;
+                    }
+                });
+                
+                if (req) {
+                    const feats = type === 'fieldHack' ? gameData.fieldHackFeats : gameData.classFeatsByType[type];
+                    sections.push(section('', `
+                        <div id="toggle-feats" class="flex items-center justify-between cursor-pointer">
+                            <h3 class="text-lg font-semibold text-gray-300 flex items-center gap-2">
+                                ${icons.sparkles} Class Feat Selection
+                            </h3>
+                            <span class="${state.showClassFeats ? 'rotate-180' : ''} transition-transform">${icons.chevronDown}</span>
+                        </div>
+                        ${state.showClassFeats ? `
+                            <p class="text-sm text-gray-400 mb-4 mt-3">Select ${req} ${type === 'fieldHack' ? 'Field Hack' : type} feat${req > 1 ? 's' : ''}</p>
+                            <div class="space-y-2">
+                                ${feats.map(feat => {
+                                    const sel = c.classFeats.includes(feat.name);
+                                    const can = c.classFeats.length < req && !sel;
+                                    return `
+                                        <button data-feat="${feat.name}" class="feat-btn w-full text-left p-3 rounded border transition-all ${
+                                            sel ? 'border-purple-500 bg-purple-500/20' :
+                                            can ? 'border-gray-600 bg-gray-800 hover:border-gray-500' :
+                                            'border-gray-700 bg-gray-900/50 opacity-50 cursor-not-allowed'
+                                        }" ${!can && !sel ? 'disabled' : ''}>
+                                            <div class="flex justify-between items-start">
+                                                <div class="flex-1">
+                                                    <div class="font-semibold text-sm text-white">${feat.name}</div>
+                                                    <div class="text-xs text-gray-400 mt-1">${feat.description}</div>
+                                                </div>
+                                                ${sel ? '<div class="ml-2 text-purple-400">✓</div>' : ''}
+                                            </div>
+                                        </button>
+                                    `;
+                                }).join('')}
+                            </div>
+                            <div class="mt-4 text-sm text-gray-400">Selected: ${c.classFeats.length}/${req}</div>
+                        ` : ''}
+                    `));
+                }
+            }
+            
+            // Level 4 ASI
+            if (c.level >= 4) {
+                sections.push(section('Level 4 - Ability Score Improvement', `
+                    <p class="text-sm text-gray-400 mb-4">Choose either: +2 to one ability score, OR +1 to two different ability scores</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Option 1: +2 to one ability</label>
+                            <select id="asi-option1" class="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white">
+                                <option value="">Select ability...</option>
+                                ${['strength','dexterity','constitution','intelligence','wisdom','charisma'].map(a => 
+                                    `<option value="${a}_2" ${c.abilityScoreImprovements?.option1 === `${a}_2` ? 'selected' : ''}>${a[0].toUpperCase() + a.slice(1)} +2</option>`
+                                ).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Option 2: +1 to two abilities</label>
+                            <div class="space-y-2">
+                                <select id="asi-option2a" class="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white">
+                                    <option value="">First ability +1...</option>
+                                    ${['strength','dexterity','constitution','intelligence','wisdom','charisma'].map(a => 
+                                        `<option value="${a}" ${c.abilityScoreImprovements?.option2a === a ? 'selected' : ''}>${a[0].toUpperCase() + a.slice(1)} +1</option>`
+                                    ).join('')}
+                                </select>
+                                <select id="asi-option2b" class="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white">
+                                    <option value="">Second ability +1...</option>
+                                    ${['strength','dexterity','constitution','intelligence','wisdom','charisma'].map(a => 
+                                        `<option value="${a}" ${c.abilityScoreImprovements?.option2b === a ? 'selected' : ''}>${a[0].toUpperCase() + a.slice(1)} +1</option>`
+                                    ).join('')}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                `));
+            }
+            
+            // Level 5 Attack Specialist
+            if (c.level === 5) {
+                sections.push(section('Bonus Feat - Attack Specialist (Level 5)', `
+                    <p class="text-sm text-gray-400 mb-3">Choose a weapon type to gain +1 to attack and damage rolls</p>
+                    <select id="attack-specialist" class="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white">
+                        <option value="">Select weapon type...</option>
+                        ${gameData.weapons.map(w => `<option value="${w}" ${state.attackSpecialistChoice === w ? 'selected' : ''}>${w}</option>`).join('')}
+                    </select>
+                `));
+            }
+            
+            // Ability scores
+            sections.push(section('Ability Scores (Point Buy) - Base Values', `
+                <div class="flex justify-between mb-4">
+                    <span class="${ps > 27 ? 'text-red-300' : 'text-green-300'} text-sm">Points: ${ps}/27</span>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    ${Object.entries(c.abilityScores).map(([ability, score]) => {
+                        const {racial, origin, asi} = getAbilityBonuses(ability);
+                        const bonus = racial + origin + asi;
+                        const final = score + bonus;
+                        return `
+                            <div class="bg-gray-800 rounded-lg p-3">
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-xs text-gray-400 capitalize">${ability}</span>
+                                    <span class="text-xs text-blue-300">Final: ${final} (${getModifier(final) >= 0 ? '+' : ''}${getModifier(final)})</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button data-ability="${ability}" data-action="decrease" class="ability-btn w-8 h-8 bg-gray-700 rounded ${score <= 8 ? 'opacity-50' : 'hover:bg-gray-600'}" ${score <= 8 ? 'disabled' : ''}>-</button>
+                                    <div class="flex-1 text-center">
+                                        <div class="text-lg font-bold text-white">${score}</div>
+                                        ${bonus ? `<div class="text-xs text-green-400">+${bonus}</div>` : ''}
+                                    </div>
+                                    <button data-ability="${ability}" data-action="increase" class="ability-btn w-8 h-8 bg-gray-700 rounded ${score >= 15 || ps >= 27 ? 'opacity-50' : 'hover:bg-gray-600'}" ${score >= 15 || ps >= 27 ? 'disabled' : ''}>+</button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `));
+            
+            // Combat stats
+            sections.push(section('Combat Statistics', `
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    ${[
+                        ['Hit Points', c.hp, icons.heart, 'text-red-400'],
+                        ['Armor Class', c.armorClass, icons.shield, 'text-blue-400'],
+                        ['Initiative', `${c.initiative >= 0 ? '+' : ''}${c.initiative}`, icons.zap, 'text-yellow-400'],
+                        ['Determination', c.determinationPoints, icons.brain, 'text-purple-400'],
+                        ['Speed', `${c.speed}m`, icons.activity, 'text-green-400'],
+                        ['Moxie', `${c.moxie >= 0 ? '+' : ''}${c.moxie}`, icons.user, 'text-cyan-400']
+                    ].map(([label, value, icon, color]) => `
+                        <div class="bg-gray-800 rounded-lg p-3">
+                            <div class="flex items-center gap-2 ${color} mb-1">
+                                <span class="icon icon-md">${icon}</span>
+                                <span class="text-xs">${label}</span>
+                            </div>
+                            <div class="text-2xl font-bold text-white">${value || 0}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="mt-4 p-3 bg-gray-800 rounded-lg">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-400">Proficiency Bonus</span>
+                        <span class="text-lg font-bold text-white">+${getProficiencyBonus(c.level)}</span>
+                    </div>
+                </div>
+            `));
+            
+            // Duplicate proficiencies
+            if (totalReplacements > 0) {
+                sections.push(section('', `
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="text-yellow-300">${icons.warning}</span>
+                        <h3 class="text-lg font-semibold text-yellow-300">Duplicate Skill Proficiencies</h3>
+                    </div>
+                    
+                    <div class="p-3 bg-yellow-900/20 border border-yellow-600/50 rounded-lg mb-4">
+                        <p class="text-sm text-yellow-200">
+                            You have duplicate skill proficiencies from multiple sources:
+                        </p>
+                        <ul class="mt-2 text-xs text-yellow-100">
+                            ${duplicateSkills.map(({skill, duplicates}) => 
+                                `<li>• <strong>${skill}</strong> appears ${duplicates + 1} times (${duplicates} duplicate${duplicates > 1 ? 's' : ''})</li>`
+                            ).join('')}
+                        </ul>
+                        <p class="text-sm text-yellow-200 mt-3">
+                            <strong>Select ${totalReplacements} skill${totalReplacements > 1 ? 's' : ''} to replace the duplicate${totalReplacements > 1 ? 's' : ''}:</strong>
+                        </p>
+                        <p class="text-xs text-yellow-100 mt-1">
+                            Selected: ${c.duplicateProficiencyChoices.filter(s => s).length} / ${totalReplacements}
+                        </p>
+                    </div>
+                    
+                    <div class="p-3 bg-gray-800 rounded-lg">
+                        <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                            ${gameData.skills.map(skill => {
+                                const selectedIndex = c.duplicateProficiencyChoices.indexOf(skill);
+                                const isSelected = selectedIndex !== -1;
+                                const finalProfs = getFinalSkillProficiencies();
+                                const alreadyProficient = finalProfs.includes(skill) && !isSelected;
+                                const disabled = alreadyProficient;
+                                const canSelect = !disabled && !isSelected && c.duplicateProficiencyChoices.filter(s => s).length < totalReplacements;
+                                
+                                return `
+                                    <button 
+                                        data-duplicate-skill="${skill}" 
+                                        class="duplicate-btn p-2 rounded text-xs transition-all ${
+                                            isSelected ? 'bg-green-500/20 border-2 border-green-500 text-white font-semibold' :
+                                            disabled ? 'bg-gray-900 border border-gray-700 text-gray-600 opacity-50 cursor-not-allowed' :
+                                            canSelect ? 'bg-gray-800 border border-gray-600 text-gray-300 hover:border-gray-500' :
+                                            'bg-gray-800 border border-gray-600 text-gray-400 opacity-70'
+                                        }" 
+                                        ${disabled ? 'disabled' : ''}
+                                    >
+                                        ${skill}
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 p-3 bg-gray-800/50 rounded">
+                        <div class="text-xs text-gray-300">
+                            <strong>Final Skill Proficiencies:</strong>
+                            <div class="mt-1 flex flex-wrap gap-1">
+                                ${getFinalSkillProficiencies().map(skill => `
+                                    <span class="px-2 py-1 bg-gray-700 rounded text-xs">${skill}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `, true));
+            }
+            
+            // Export button
+            sections.push(`
+                <div class="flex justify-end">
+                    <button id="export-btn" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 flex items-center gap-2">
+                        ${icons.download} Export Character Sheet
+                    </button>
+                </div>
+            `);
+            
+            return sections.join('');
+        };
+
+        // Event listeners
+        const attachEventListeners = () => {
+            const on = (sel, evt, fn) => document.querySelectorAll(sel).forEach(el => el.addEventListener(evt, fn));
+            
+            document.getElementById('character-name')?.addEventListener('input', e => state.character.name = e.target.value);
+            
+            on('.race-btn', 'click', e => {
+                state.character.race = e.currentTarget.dataset.race;
+                state.character.subrace = '';
+                state.character.abilityChoice = '';
+                state.character.raceChoices = {};
+                state.character.duplicateProficiencyChoices = [];
+                render();
+            });
+            
+            on('.subrace-btn', 'click', e => {
+                state.character.subrace = e.currentTarget.dataset.subrace;
+                state.character.abilityChoice = '';
+                state.character.raceChoices = {};
+                state.character.duplicateProficiencyChoices = [];
+                render();
+            });
+            
+            on('.ability-choice-btn', 'click', e => {
+                state.character.abilityChoice = e.currentTarget.dataset.abilityChoice;
+                render();
+            });
+            
+            on('.race-weapon-btn', 'click', e => {
+                const w = e.currentTarget.dataset.raceWeapon;
+                const weapons = state.character.raceChoices.weapons || [];
+                const max = getRaceData()?.proficiencies?.weapons?.count || 1;
+                
+                if (weapons.includes(w)) {
+                    state.character.raceChoices.weapons = weapons.filter(x => x !== w);
+                } else if (weapons.length < max) {
+                    state.character.raceChoices.weapons = [...weapons, w];
+                }
+                render();
+            });
+            
+            on('.race-skill-btn', 'click', e => {
+                const s = e.currentTarget.dataset.raceSkill;
+                const skills = state.character.raceChoices.skills || [];
+                const max = getRaceData()?.proficiencies?.skills?.count || 1;
+                
+                if (skills.includes(s)) {
+                    state.character.raceChoices.skills = skills.filter(x => x !== s);
+                } else if (skills.length < max) {
+                    state.character.raceChoices.skills = [...skills, s];
+                }
+                state.character.duplicateProficiencyChoices = [];
+                render();
+            });
+            
+            on('.additional-skill-btn', 'click', e => {
+                const s = e.currentTarget.dataset.additionalSkill;
+                const skills = state.character.raceChoices.additionalSkills || [];
+                const max = getRaceData()?.proficiencies?.skills?.additionalChoice?.count || 1;
+                
+                if (skills.includes(s)) {
+                    state.character.raceChoices.additionalSkills = skills.filter(x => x !== s);
+                } else if (skills.length < max) {
+                    state.character.raceChoices.additionalSkills = [...skills, s];
+                }
+                state.character.duplicateProficiencyChoices = [];
+                render();
+            });
+            
+            on('.origin-choice-btn', 'click', e => {
+                const originName = e.currentTarget.dataset.originChoice;
+                const choice = e.currentTarget.dataset.choice;
+                state.character.originChoices[originName] = choice;
+                render();
+            });
+            
+            on('.origin-btn', 'click', e => {
+                const name = e.currentTarget.dataset.origin;
+                const type = e.currentTarget.dataset.originType;
+                const c = state.character;
+                
+                if (name === 'Former Host' && c.race === 'Jaffa') return;
+                
+                // Check racial origin restrictions
+                if (type === 'racial') {
+                    const origin = gameData.origins.racial[c.race]?.find(o => o.name === name);
+                    if (origin && !isRacialOriginAvailable(origin)) return;
+                }
+                
+                // Save scroll positions
+                const scrollPositions = {};
+                document.querySelectorAll('.max-h-96.overflow-y-auto').forEach((el, index) => {
+                    scrollPositions[index] = el.scrollTop;
+                });
+                
+                if (c.origins.includes(name)) {
+                    c.origins = c.origins.filter(o => o !== name);
+                    delete c.originChoices[name];
+                } else if (c.origins.length < 2) {
+                    const hasType = type === 'racial' ? 
+                        c.origins.some(o => gameData.origins.racial[c.race]?.find(x => x.name === o)) :
+                        c.origins.some(o => gameData.origins[type].find(x => x.name === o));
+                    if (!hasType) c.origins.push(name);
+                }
+                state.character.duplicateProficiencyChoices = [];
+                
+                document.getElementById('app').style.opacity = '0.99';
+                
+                render();
+                
+                requestAnimationFrame(() => {
+                    document.querySelectorAll('.max-h-96.overflow-y-auto').forEach((el, index) => {
+                        if (scrollPositions[index] !== undefined) {
+                            el.scrollTop = scrollPositions[index];
+                        }
+                    });
+                    document.getElementById('app').style.opacity = '1';
+                });
+            });
+            
+            on('.class-btn', 'click', e => {
+                state.character.class = e.currentTarget.dataset.class;
+                state.character.classFeats = [];
+                state.character.duplicateProficiencyChoices = [];
+                render();
+            });
+            
+            on('.level-btn', 'click', e => {
+                state.character.level = parseInt(e.currentTarget.dataset.level);
+                if (state.character.level === 5) {
+                    state.character.bonusFeats = ['Attack Specialist'];
+                } else {
+                    state.character.bonusFeats = [];
+                }
+                render();
+            });
+            
+            on('.feat-btn', 'click', e => {
+                const feat = e.currentTarget.dataset.feat;
+                const c = state.character;
+                const cd = getClassData();
+                let max = 0;
+                
+                Object.entries(cd.featChoices || {}).forEach(([l, ch]) => {
+                    if (parseInt(l) <= c.level) max += ch.count;
+                });
+                
+                if (c.classFeats.includes(feat)) {
+                    c.classFeats = c.classFeats.filter(f => f !== feat);
+                } else if (c.classFeats.length < max) {
+                    c.classFeats.push(feat);
+                }
+                render();
+            });
+            
+            on('.duplicate-btn', 'click', e => {
+                if (e.currentTarget.disabled) return;
+                
+                const skill = e.currentTarget.dataset.duplicateSkill;
+                const { totalReplacements } = getDuplicateAnalysis();
+                
+                if (!Array.isArray(state.character.duplicateProficiencyChoices)) {
+                    state.character.duplicateProficiencyChoices = new Array(totalReplacements).fill('');
+                }
+                
+                const existingIndex = state.character.duplicateProficiencyChoices.indexOf(skill);
+                
+                if (existingIndex !== -1) {
+                    state.character.duplicateProficiencyChoices[existingIndex] = '';
+                } else {
+                    const emptyIndex = state.character.duplicateProficiencyChoices.indexOf('');
+                    if (emptyIndex !== -1) {
+                        state.character.duplicateProficiencyChoices[emptyIndex] = skill;
+                    }
+                }
+                
+                render();
+            });
+            
+            on('.ability-btn', 'click', e => {
+                const ability = e.currentTarget.dataset.ability;
+                const action = e.currentTarget.dataset.action;
+                const c = state.character;
+                const current = c.abilityScores[ability];
+                
+                if (action === 'increase' && current < 15) {
+                    const newCost = getPointsSpent() + (pointBuyCost[current + 1] - pointBuyCost[current]);
+                    if (newCost <= 27) c.abilityScores[ability]++;
+                } else if (action === 'decrease' && current > 8) {
+                    c.abilityScores[ability]--;
+                }
+                render();
+            });
+            
+            document.getElementById('toggle-feats')?.addEventListener('click', () => {
+                state.showClassFeats = !state.showClassFeats;
+                render();
+            });
+            
+            document.getElementById('toggle-abilities')?.addEventListener('click', () => {
+                state.showClassAbilities = !state.showClassAbilities;
+                render();
+            });
+            
+            document.getElementById('attack-specialist')?.addEventListener('change', e => {
+                state.attackSpecialistChoice = e.target.value;
+                if (e.target.value) {
+                    state.character.bonusFeats = [`Attack Specialist (${e.target.value})`];
+                }
+            });
+            
+            document.getElementById('asi-option1')?.addEventListener('change', e => {
+                if (e.target.value) {
+                    state.character.abilityScoreImprovements = {option1: e.target.value};
+                    render();
+                }
+            });
+            
+            document.getElementById('asi-option2a')?.addEventListener('change', e => {
+                if (e.target.value) {
+                    state.character.abilityScoreImprovements = {
+                        option2a: e.target.value,
+                        option2b: state.character.abilityScoreImprovements?.option2b || ''
+                    };
+                    render();
+                }
+            });
+            
+            document.getElementById('asi-option2b')?.addEventListener('change', e => {
+                if (e.target.value) {
+                    state.character.abilityScoreImprovements = {
+                        option2a: state.character.abilityScoreImprovements?.option2a || '',
+                        option2b: e.target.value
+                    };
+                    render();
+                }
+            });
+            
+            document.getElementById('export-btn')?.addEventListener('click', exportCharacter);
+        };
+
+        // Initialize
+        render();
+    </script>
+</body>
+</html>
