@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stargate RPG Toolkit</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* Custom scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+
+        /* Animated background */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        .pulse-slow {
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        /* Card hover effects */
+        .tool-card {
+            transition: all 0.3s ease;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Stargate symbol animation */
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .rotate-slow {
+            animation: rotate 20s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 min-h-screen">
+    <!-- Animated background elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-20 w-64 h-64 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 pulse-slow"></div>
+        <div class="absolute top-40 right-20 w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 pulse-slow" style="animation-delay: 2s;"></div>
+        <div class="absolute bottom-20 left-1/2 w-64 h-64 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 pulse-slow" style="animation-delay: 4s;"></div>
+    </div>
+
+    <div class="relative z-10 min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-gray-800/50 backdrop-blur-md border-b border-blue-500/30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <!-- Stargate Symbol -->
+                        <div class="w-16 h-16 relative">
+                            <svg class="w-full h-full rotate-slow" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="50" cy="50" r="45" stroke="url(#grad1)" stroke-width="3"/>
+                                <circle cx="50" cy="50" r="35" stroke="url(#grad1)" stroke-width="2"/>
+                                <circle cx="50" cy="50" r="25" stroke="url(#grad1)" stroke-width="2"/>
+                                <!-- Chevrons -->
+                                <path d="M50 5 L55 15 L45 15 Z" fill="url(#grad1)"/>
+                                <path d="M85 25 L88 35 L80 32 Z" fill="url(#grad1)"/>
+                                <path d="M95 50 L98 55 L92 55 Z" fill="url(#grad1)"/>
+                                <path d="M85 75 L88 70 L80 73 Z" fill="url(#grad1)"/>
+                                <path d="M50 95 L55 85 L45 85 Z" fill="url(#grad1)"/>
+                                <path d="M15 75 L12 70 L20 73 Z" fill="url(#grad1)"/>
+                                <path d="M5 50 L2 55 L8 55 Z" fill="url(#grad1)"/>
+                                <path d="M15 25 L12 35 L20 32 Z" fill="url(#grad1)"/>
+                                <defs>
+                                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-bold text-white">Stargate RPG Toolkit</h1>
+                            <p class="text-blue-200 text-sm">Your complete game master resource hub</p>
+                        </div>
+                    </div>
+                    <div class="hidden md:flex items-center gap-4">
+                        <span class="text-blue-300 text-sm">v1.0.0</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <!-- Welcome Section -->
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                    Welcome to the Stargate RPG Toolkit
+                </h2>
+                <p class="text-xl text-blue-200 max-w-3xl mx-auto">
+                    A comprehensive suite of tools designed to help game masters create immersive Stargate campaigns with professional-quality NPCs, characters, and inventory management.
+                </p>
+            </div>
+
+            <!-- Tools Grid -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                <!-- NPC Builder Card -->
+                <div class="tool-card bg-gray-800/90 backdrop-blur-sm rounded-xl shadow-2xl border border-blue-500/30 overflow-hidden cursor-pointer"
+                     onclick="window.location.href='npc-builder.html'">
+                    <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-6">
+                        <div class="flex items-center gap-3 mb-2">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                            <h3 class="text-2xl font-bold text-white">NPC Builder</h3>
+                        </div>
+                        <p class="text-blue-100 text-sm">Create balanced NPCs & Beasts</p>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-300 mb-4">
+                            Create fully-statted NPCs and beasts with automatic calculations, feat selection, and point-buy system. Includes beast abilities and comprehensive stat blocks.
+                        </p>
+                        <ul class="space-y-2 text-sm text-gray-400">
+                            <li class="flex items-start gap-2">
+                                <span class="text-blue-400 mt-1">✓</span>
+                                <span>Challenge Rating 1-20</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-blue-400 mt-1">✓</span>
+                                <span>Automatic stat calculations</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-blue-400 mt-1">✓</span>
+                                <span>150+ feats & beast abilities</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-blue-400 mt-1">✓</span>
+                                <span>Export to text file</span>
+                            </li>
+                        </ul>
+                        <div class="mt-6">
+                            <button class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-all">
+                                Launch NPC Builder →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Character Builder Card -->
+                <div class="tool-card bg-gray-800/90 backdrop-blur-sm rounded-xl shadow-2xl border border-green-500/30 overflow-hidden cursor-pointer"
+                     onclick="window.location.href='character-builder.html'">
+                    <div class="bg-gradient-to-r from-green-600 to-teal-600 p-6">
+                        <div class="flex items-center gap-3 mb-2">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            <h3 class="text-2xl font-bold text-white">Character Builder</h3>
+                        </div>
+                        <p class="text-green-100 text-sm">Build player characters</p>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-300 mb-4">
+                            Create detailed player characters with class selection, background options, and full progression tracking from level 1 to 20.
+                        </p>
+                        <ul class="space-y-2 text-sm text-gray-400">
+                            <li class="flex items-start gap-2">
+                                <span class="text-green-400 mt-1">✓</span>
+                                <span>Multiple character classes</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-green-400 mt-1">✓</span>
+                                <span>Background & origin selection</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-green-400 mt-1">✓</span>
+                                <span>Level 1-20 progression</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-green-400 mt-1">✓</span>
+                                <span>Full character sheet export</span>
+                            </li>
+                        </ul>
+                        <div class="mt-6">
+                            <button class="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white font-semibold py-3 px-4 rounded-lg transition-all">
+                                Launch Character Builder →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventory Builder Card -->
+                <div class="tool-card bg-gray-800/90 backdrop-blur-sm rounded-xl shadow-2xl border border-amber-500/30 overflow-hidden cursor-pointer"
+                     onclick="window.location.href='inventory-builder.html'">
+                    <div class="bg-gradient-to-r from-amber-600 to-orange-600 p-6">
+                        <div class="flex items-center gap-3 mb-2">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </svg>
+                            <h3 class="text-2xl font-bold text-white">Inventory Builder</h3>
+                        </div>
+                        <p class="text-amber-100 text-sm">Manage equipment & gear</p>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-300 mb-4">
+                            Organize and track equipment, weapons, and gear for your characters and teams. Includes weight calculations and item management.
+                        </p>
+                        <ul class="space-y-2 text-sm text-gray-400">
+                            <li class="flex items-start gap-2">
+                                <span class="text-amber-400 mt-1">✓</span>
+                                <span>Comprehensive item database</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-amber-400 mt-1">✓</span>
+                                <span>Weight & encumbrance tracking</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-amber-400 mt-1">✓</span>
+                                <span>Custom item creation</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-amber-400 mt-1">✓</span>
+                                <span>Export inventory lists</span>
+                            </li>
+                        </ul>
+                        <div class="mt-6">
+                            <button class="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold py-3 px-4 rounded-lg transition-all">
+                                Launch Inventory Builder →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Section -->
+            <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-blue-500/30">
+                <h3 class="text-2xl font-bold text-white mb-6 text-center">Toolkit Features</h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-semibold text-white mb-2">No Installation</h4>
+                        <p class="text-gray-400 text-sm">Works entirely in your browser. No downloads or installation required.</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-semibold text-white mb-2">Fully Customizable</h4>
+                        <p class="text-gray-400 text-sm">Tailored specifically for Stargate RPG with all official rules and content.</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-semibold text-white mb-2">Export Ready</h4>
+                        <p class="text-gray-400 text-sm">Download your creations as text files for easy reference during gameplay.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800/50 backdrop-blur-md border-t border-blue-500/30 mt-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p class="text-gray-400 text-sm">
+                        Created for the Stargate RPG community
+                    </p>
+                    <div class="flex items-center gap-6 text-sm text-gray-400">
+                        <a href="https://github.com/Onyx-Timaeus" target="_blank" class="hover:text-blue-400 transition-colors">
+                            GitHub
+                        </a>
+                        <span>•</span>
+                        <span>Open Source</span>
+                        <span>•</span>
+                        <span>Free to Use</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
